@@ -1,0 +1,195 @@
+<div class="home">
+
+  <!-- Market Data Card — collapsible floating widget -->
+  <div class="market-card" [class.market-card--collapsed]="!marketCardOpen()">
+    <div class="market-card__header" (click)="toggleMarketCard()">
+      <div class="market-card__header-left">
+        <span class="market-card__dot"></span>
+        <span class="market-card__title">Live Market</span>
+        @if (!marketCardOpen() && marketData()) {
+          <span class="market-card__pill text-teal">
+            Nifty {{ marketData().nifty50 | number:'1.0-0' }}
+          </span>
+        }
+      </div>
+      <button class="market-card__toggle">
+        {{ marketCardOpen() ? '−' : '+' }}
+      </button>
+    </div>
+
+    @if (marketCardOpen()) {
+      <div class="market-card__body">
+        @if (marketLoading()) {
+          <span class="market-card__loading">Fetching live data...</span>
+        } @else if (marketData()) {
+          <div class="market-card__items">
+            <div class="market-card__item">
+              <span class="market-card__label">Repo Rate</span>
+              <span class="market-card__value text-teal">
+                {{ marketData().repoRate }}%
+              </span>
+            </div>
+            <div class="market-card__item">
+              <span class="market-card__label">Inflation</span>
+              <span class="market-card__value">
+                {{ marketData().inflationRate }}%
+              </span>
+            </div>
+            <div class="market-card__item">
+              <span class="market-card__label">Nifty 50</span>
+              <span class="market-card__value">
+                {{ marketData().nifty50 | number:'1.0-0' }}
+              </span>
+            </div>
+            <div class="market-card__item">
+              <span class="market-card__label">Sensex</span>
+              <span class="market-card__value">
+                {{ marketData().sensexValue | number:'1.0-0' }}
+              </span>
+            </div>
+            <div class="market-card__item">
+              <span class="market-card__label">USD / INR</span>
+              <span class="market-card__value">
+                ₹{{ marketData().usdInr }}
+              </span>
+            </div>
+            <div class="market-card__item">
+              <span class="market-card__label">Gold / 10g</span>
+              <span class="market-card__value text-amber">
+                ₹{{ marketData().goldPer10g | number:'1.0-0' }}
+              </span>
+            </div>
+          </div>
+          <div class="market-card__footer">
+            {{ marketData().dataSource }} ·
+            {{ marketData().lastUpdated | date:'dd MMM, HH:mm' }}
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- Rest of page stays exactly the same from here -->
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero__content" scrollReveal revealDirection="fadeUp">
+        <div class="badge badge--teal hero__badge">
+          12 Financial Models · Real-Time Market Data
+        </div>
+        <h1 class="hero__title">
+          Understand Markets.<br>
+          <span class="text-teal">Plan Smarter.</span>
+        </h1>
+        <p class="hero__desc">
+          Analyse loan risk profiles, plan investments, and compare
+          financial strategies — all backed by institutional-grade models
+          including Black-Scholes, CAPM, Sharpe Ratio, and Value at Risk.
+        </p>
+        <div class="hero__actions">
+          <a routerLink="/apply"  class="btn btn--primary btn--lg">
+            Start Analysis
+          </a>
+          <a routerLink="/invest" class="btn btn--outline btn--lg">
+            Investment Tools
+          </a>
+        </div>
+      </div>
+
+      <div class="hero__pills"
+           scrollReveal revealDirection="fadeLeft" [revealDelay]="200">
+        @for (model of models; track model.name) {
+          <div class="hero__pill">
+            <span class="hero__pill-name">{{ model.name }}</span>
+            <span class="hero__pill-tag">{{ model.tag }}</span>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <section class="stats">
+    <div class="container">
+      <div class="stats__grid">
+        <div class="stat-card"
+             scrollReveal revealDirection="fadeUp" [revealDelay]="0">
+          <div class="stat-card__label">Profiles Analysed</div>
+          <div class="stat-card__value mono">{{ loansProcessed() | number }}</div>
+          <div class="stat-card__sub">Total risk assessments run</div>
+        </div>
+        <div class="stat-card"
+             scrollReveal revealDirection="fadeUp" [revealDelay]="100">
+          <div class="stat-card__label">Avg Risk Score</div>
+          <div class="stat-card__value mono text-teal">{{ avgRiskScore() }}</div>
+          <div class="stat-card__sub">Out of 100 · higher is safer</div>
+        </div>
+        <div class="stat-card"
+             scrollReveal revealDirection="fadeUp" [revealDelay]="200">
+          <div class="stat-card__label">Capital Analysed</div>
+          <div class="stat-card__value mono">₹{{ portfolioValue() }}Cr</div>
+          <div class="stat-card__sub">Total portfolio value assessed</div>
+        </div>
+        <div class="stat-card"
+             scrollReveal revealDirection="fadeUp" [revealDelay]="300">
+          <div class="stat-card__label">Low Risk Rate</div>
+          <div class="stat-card__value mono text-approve">{{ approvalRate() }}%</div>
+          <div class="stat-card__sub">Profiles with healthy risk score</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Journey Cards -->
+  <section class="section journeys">
+    <div class="container">
+      <div class="journeys__header" scrollReveal revealDirection="fadeUp">
+        <h2>What do you want to do?</h2>
+        <p>Three tools. All backed by the same institutional-grade engine.</p>
+      </div>
+      <div class="journeys__grid">
+        @for (j of journeys; track j.title; let i = $index) {
+          <div class="journey-card journey-card--{{ j.color }}"
+               scrollReveal revealDirection="fadeUp"
+               [revealDelay]="i * 120">
+            <div class="journey-card__icon journey-card__icon--{{ j.color }}">
+              {{ j.icon }}
+            </div>
+            <h3 class="journey-card__title">{{ j.title }}</h3>
+            <p class="journey-card__desc">{{ j.desc }}</p>
+            <div class="journey-card__models">
+              @for (m of j.models; track m) {
+                <span class="badge badge--teal">{{ m }}</span>
+              }
+            </div>
+            <a [routerLink]="j.route" class="btn btn--outline journey-card__cta">
+              {{ j.cta }} →
+            </a>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- 12 Models Grid -->
+  <section class="section models-section">
+    <div class="container">
+      <div class="journeys__header" scrollReveal revealDirection="fadeUp">
+        <h2>12 Financial Models</h2>
+        <p>Every calculation is transparent, explainable, and grounded
+           in real finance theory.</p>
+      </div>
+      <div class="models-grid">
+        @for (m of models; track m.name; let i = $index) {
+          <div class="model-chip"
+               scrollReveal revealDirection="fadeUp"
+               [revealDelay]="i * 50">
+            <span class="model-chip__name">{{ m.name }}</span>
+            <span class="model-chip__tag">{{ m.tag }}</span>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+</div>

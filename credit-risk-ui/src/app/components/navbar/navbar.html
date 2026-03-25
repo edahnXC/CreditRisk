@@ -1,0 +1,43 @@
+<nav class="navbar" [class.navbar--scrolled]="scrolled()">
+  <div class="container">
+    <div class="navbar__inner">
+
+      <a routerLink="/" class="navbar__brand" (click)="closeMenu()">
+        <span class="navbar__brand-icon">CR</span>
+        <span class="navbar__brand-text">CreditRisk<span class="text-teal">.</span></span>
+      </a>
+
+      <div class="navbar__links" [class.navbar__links--open]="menuOpen()">
+        <a routerLink="/"
+           routerLinkActive="active"
+           [routerLinkActiveOptions]="{exact:true}"
+           (click)="closeMenu()">Home</a>
+        <a routerLink="/apply"
+           routerLinkActive="active"
+           (click)="closeMenu()">Analyse</a>
+        <a routerLink="/invest"
+           routerLinkActive="active"
+           (click)="closeMenu()">Invest</a>
+        <a routerLink="/compare"
+           routerLinkActive="active"
+           (click)="closeMenu()">Compare</a>
+           <a routerLink="/learn"
+   routerLinkActive="active"
+   (click)="closeMenu()">Learn</a>
+      </div>
+
+      <div class="navbar__actions">
+        <a routerLink="/apply" class="btn btn--primary btn--sm">
+          Start Analysis
+        </a>
+        <button class="navbar__burger" (click)="toggleMenu()"
+                [class.navbar__burger--open]="menuOpen()">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+</nav>

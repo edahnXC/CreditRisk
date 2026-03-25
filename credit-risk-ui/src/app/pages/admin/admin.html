@@ -1,0 +1,385 @@
+<div class="admin-page">
+  <div class="container">
+
+    @if (!isLoggedIn()) {
+      <div class="login-wrap" scrollReveal revealDirection="fadeUp">
+        <div class="login-card">
+          <div class="login-card__icon">CR</div>
+          <div class="login-card__title">Admin Access</div>
+          <p class="login-card__desc">
+            This area is restricted to administrators only.
+          </p>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input class="form-input"
+                   type="password"
+                   placeholder="Enter admin password"
+                   [(ngModel)]="password"
+                   (keyup.enter)="login()">
+          </div>
+          @if (loginError()) {
+            <div class="login-error">{{ loginError() }}</div>
+          }
+          <button class="btn btn--primary" style="width:100%"
+                  (click)="login()">
+            Sign In →
+          </button>
+          <a routerLink="/" class="login-card__back">← Back to Home</a>
+        </div>
+      </div>
+    }
+
+    @if (isLoggedIn()) {
+
+      <div class="admin-header" scrollReveal revealDirection="fadeUp">
+        <div>
+          <div class="badge badge--teal">Admin Panel</div>
+          <h1>Dashboard</h1>
+        </div>
+        <button class="btn btn--ghost" (click)="logout()">
+          Sign Out
+        </button>
+      </div>
+
+      <div class="section-nav" scrollReveal revealDirection="fadeIn">
+        <button class="section-nav__btn"
+                [class.active]="activeSection() === 'analytics'"
+                (click)="setSection('analytics')">
+          Analytics
+        </button>
+        <button class="section-nav__btn"
+                [class.active]="activeSection() === 'market'"
+                (click)="setSection('market')">
+          Market Data
+        </button>
+        <button class="section-nav__btn"
+                [class.active]="activeSection() === 'learn'"
+                (click)="setSection('learn')">
+          Learn Content
+        </button>
+        <button class="section-nav__btn"
+                [class.active]="activeSection() === 'logs'"
+                (click)="setSection('logs')">
+          Analysis Logs
+        </button>
+      </div>
+
+      @if (activeSection() === 'analytics') {
+        <div class="admin-section" scrollReveal revealDirection="fadeUp">
+          @if (analyticsLoading()) {
+            <div class="loading-state">
+              <div class="loading-spinner"></div>
+              <p>Loading analytics...</p>
+            </div>
+          }
+          @if (analytics()) {
+            <div class="analytics-grid">
+              <div class="stat-card">
+                <div class="stat-card__label">Total Analyses</div>
+                <div class="stat-card__value mono">
+                  {{ analytics().totalAnalyses | number }}
+                </div>
+                <div class="stat-card__sub">All time</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-card__label">Avg Risk Score</div>
+                <div class="stat-card__value mono text-teal">
+                  {{ analytics().avgScore | number:'1.1-1' }}
+                </div>
+                <div class="stat-card__sub">Out of 100</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-card__label">High Likelihood</div>
+                <div class="stat-card__value mono text-approve">
+                  {{ analytics().approved | number }}
+                </div>
+                <div class="stat-card__sub">
+                  {{ analytics().approvalRate }}% of total
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-card__label">Low Likelihood</div>
+                <div class="stat-card__value mono text-reject">
+                  {{ analytics().rejected | number }}
+                </div>
+                <div class="stat-card__sub">Need improvement</div>
+              </div>
+            </div>
+
+            <div class="distribution-card">
+              <div class="distribution-card__title">
+                Decision Distribution
+              </div>
+              <div class="distribution-bars">
+                <div class="dist-bar">
+                  <span class="dist-bar__label">High Likelihood</span>
+                  <div class="dist-bar__track">
+                    <div class="dist-bar__fill dist-bar__fill--approve"
+                         [style.width.%]="analytics().totalAnalyses > 0 ?
+                           (analytics().approved / analytics().totalAnalyses * 100) : 0">
+                    </div>
+                  </div>
+                  <span class="dist-bar__value text-approve">
+                    {{ (analytics().totalAnalyses > 0 ? (analytics().approved / analytics().totalAnalyses * 100) : 0) | number:'1.0-0' }}%
+                  </span>
+                </div>
+                <div class="dist-bar">
+                  <span class="dist-bar__label">Needs Review</span>
+                  <div class="dist-bar__track">
+                    <div class="dist-bar__fill dist-bar__fill--review"
+                         [style.width.%]="analytics().totalAnalyses > 0 ?
+                           (analytics().reviewed / analytics().totalAnalyses * 100) : 0">
+                    </div>
+                  </div>
+                  <span class="dist-bar__value text-review">
+                    {{ (analytics().totalAnalyses > 0 ? (analytics().reviewed / analytics().totalAnalyses * 100) : 0) | number:'1.0-0' }}%
+                  </span>
+                </div>
+                <div class="dist-bar">
+                  <span class="dist-bar__label">Low Likelihood</span>
+                  <div class="dist-bar__track">
+                    <div class="dist-bar__fill dist-bar__fill--reject"
+                         [style.width.%]="analytics().totalAnalyses > 0 ?
+                           (analytics().rejected / analytics().totalAnalyses * 100) : 0">
+                    </div>
+                  </div>
+                  <span class="dist-bar__value text-reject">
+                    {{ (analytics().totalAnalyses > 0 ? (analytics().rejected / analytics().totalAnalyses * 100) : 0) | number:'1.0-0' }}%
+                  </span>
+                </div>
+              </div>
+            </div>
+          }
+          @if (!analytics() && !analyticsLoading()) {
+            <div class="empty-state">
+              No analyses have been run yet. Use the Analyse page to
+              generate data.
+            </div>
+          }
+        </div>
+      }
+
+      @if (activeSection() === 'market') {
+        <div class="admin-section" scrollReveal revealDirection="fadeUp">
+          <div class="market-editor">
+            <div class="market-editor__title">
+              Manual Market Values
+            </div>
+            <p class="market-editor__desc">
+              Update Repo Rate, Inflation, and Gold price manually
+              after each RBI announcement. These values are used
+              across all financial model calculations on the platform.
+            </p>
+
+            <div class="grid-2" style="margin-top:20px">
+              <div class="form-group">
+                <label class="form-label">
+                  RBI Repo Rate (%)
+                </label>
+                <input class="form-input" type="number"
+                       step="0.25" min="0" max="20"
+                       [(ngModel)]="marketForm.repoRate">
+                <div class="form-hint">
+                  Current: {{ marketForm.repoRate }}% —
+                  Used as risk-free rate in CAPM and Sharpe
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">
+                  CPI Inflation Rate (%)
+                </label>
+                <input class="form-input" type="number"
+                       step="0.1" min="0" max="30"
+                       [(ngModel)]="marketForm.inflationRate">
+                <div class="form-hint">
+                  Current: {{ marketForm.inflationRate }}% —
+                  Displayed on market data card
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">
+                  Gold Price per 10g (₹)
+                </label>
+                <input class="form-input" type="number"
+                       step="100" min="0"
+                       [(ngModel)]="marketForm.goldPer10g">
+                <div class="form-hint">
+                  Current: ₹{{ marketForm.goldPer10g | number }} —
+                  Displayed on market data card
+                </div>
+              </div>
+            </div>
+
+            <div class="market-editor__actions">
+              <button class="btn btn--primary"
+                      [disabled]="marketSaving()"
+                      (click)="saveMarketData()">
+                @if (marketSaving()) { Saving... }
+                @else { Save Changes }
+              </button>
+              <button class="btn btn--outline"
+                      [disabled]="marketSaving()"
+                      (click)="refreshLiveData()">
+                Refresh Live Data (Nifty, Sensex, USD/INR)
+              </button>
+            </div>
+
+            @if (marketMessage()) {
+              <div class="market-editor__message"
+                   [class.success]="marketMessage().includes('success')"
+                   [class.error]="marketMessage().includes('Failed')">
+                {{ marketMessage() }}
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      @if (activeSection() === 'learn') {
+        <div class="admin-section" scrollReveal revealDirection="fadeUp">
+
+          @if (learnMessage()) {
+            <div class="learn-message">{{ learnMessage() }}</div>
+          }
+
+          @if (editingItem()) {
+            <div class="edit-card">
+              <div class="edit-card__title">
+                Editing: {{ editingItem().modelName }}
+              </div>
+              <div class="form-group">
+                <label class="form-label">Summary</label>
+                <input class="form-input" type="text"
+                       [(ngModel)]="editingItem().summary">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Formula</label>
+                <input class="form-input" type="text"
+                       [(ngModel)]="editingItem().formula">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Explanation</label>
+                <textarea class="form-input form-textarea"
+                          [(ngModel)]="editingItem().explanation">
+                </textarea>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Real World Example</label>
+                <textarea class="form-input form-textarea"
+                          [(ngModel)]="editingItem().realExample">
+                </textarea>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Used In</label>
+                <input class="form-input" type="text"
+                       [(ngModel)]="editingItem().usedIn">
+              </div>
+              <div class="edit-card__actions">
+                <button class="btn btn--ghost"
+                        (click)="cancelEdit()">
+                  Cancel
+                </button>
+                <button class="btn btn--primary"
+                        (click)="saveLearnItem()">
+                  Save Changes
+                </button>
+              </div>
+            </div>
+          }
+
+          @if (learnLoading()) {
+            <div class="loading-state">
+              <div class="loading-spinner"></div>
+            </div>
+          }
+
+          @if (!learnLoading() && !editingItem()) {
+            <div class="learn-list">
+              @for (item of learnItems(); track item.id) {
+                <div class="learn-list__item">
+                  <div class="learn-list__item-left">
+                    <div class="learn-list__icon">
+                      {{ item.abbr }}
+                    </div>
+                    <div>
+                      <div class="learn-list__name">
+                        {{ item.modelName }}
+                      </div>
+                      <div class="learn-list__category">
+                        {{ item.category }}
+                      </div>
+                      <div class="learn-list__summary">
+                        {{ item.summary }}
+                      </div>
+                    </div>
+                  </div>
+                  <button class="btn btn--outline btn--sm"
+                          (click)="startEdit(item)">
+                    Edit
+                  </button>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      @if (activeSection() === 'logs') {
+        <div class="admin-section" scrollReveal revealDirection="fadeUp">
+          @if (logsLoading()) {
+            <div class="loading-state">
+              <div class="loading-spinner"></div>
+            </div>
+          }
+          @if (!logsLoading() && logs().length === 0) {
+            <div class="empty-state">
+              No analyses logged yet. Analyses appear here after
+              users run the Analyse tool.
+            </div>
+          }
+          @if (!logsLoading() && logs().length > 0) {
+            <div class="logs-table-wrap">
+              <table class="logs-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Loan Amount</th>
+                    <th>Interest Rate</th>
+                    <th>Score</th>
+                    <th>Decision</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (log of logs(); track log.id) {
+                    <tr>
+                      <td class="mono text-secondary">
+                        {{ log.createdAt | date:'dd MMM, HH:mm' }}
+                      </td>
+                      <td class="mono">
+                        {{ formatCurrency(log.loanAmount) }}
+                      </td>
+                      <td class="mono">
+                        {{ (log.interestRate * 100) | number:'1.1-1' }}%
+                      </td>
+                      <td class="mono">
+                        {{ log.compositeScore | number:'1.0-0' }}
+                      </td>
+                      <td>
+                        <span class="badge badge--{{
+                          getDecisionClass(log.decision)
+                        }}">
+                          {{ log.decision }}
+                        </span>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </div>
+      }
+
+    }
+  </div>
+</div>

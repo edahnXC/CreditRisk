@@ -1,0 +1,69 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "F:\\Projects\\CreditRiskSystem\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{F7B0CB89-85A3-0048-FF05-CE5A8FF80D67}|CreditRisk.API\\CreditRisk.API.csproj|f:\\projects\\creditrisksystem\\creditrisk.api\\models\\analysislog.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F7B0CB89-85A3-0048-FF05-CE5A8FF80D67}|CreditRisk.API\\CreditRisk.API.csproj|solutionrelative:creditrisk.api\\models\\analysislog.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F7B0CB89-85A3-0048-FF05-CE5A8FF80D67}|CreditRisk.API\\CreditRisk.API.csproj|f:\\projects\\creditrisksystem\\creditrisk.api\\models\\learncontent.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F7B0CB89-85A3-0048-FF05-CE5A8FF80D67}|CreditRisk.API\\CreditRisk.API.csproj|solutionrelative:creditrisk.api\\models\\learncontent.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F7B0CB89-85A3-0048-FF05-CE5A8FF80D67}|CreditRisk.API\\CreditRisk.API.csproj|f:\\projects\\creditrisksystem\\creditrisk.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F7B0CB89-85A3-0048-FF05-CE5A8FF80D67}|CreditRisk.API\\CreditRisk.API.csproj|solutionrelative:creditrisk.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "AnalysisLog.cs",
+              "DocumentMoniker": "F:\\Projects\\CreditRiskSystem\\CreditRisk.API\\Models\\AnalysisLog.cs",
+              "RelativeDocumentMoniker": "CreditRisk.API\\Models\\AnalysisLog.cs",
+              "ToolTip": "F:\\Projects\\CreditRiskSystem\\CreditRisk.API\\Models\\AnalysisLog.cs",
+              "RelativeToolTip": "CreditRisk.API\\Models\\AnalysisLog.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-24T18:14:21.285Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "LearnContent.cs",
+              "DocumentMoniker": "F:\\Projects\\CreditRiskSystem\\CreditRisk.API\\Models\\LearnContent.cs",
+              "RelativeDocumentMoniker": "CreditRisk.API\\Models\\LearnContent.cs",
+              "ToolTip": "F:\\Projects\\CreditRiskSystem\\CreditRisk.API\\Models\\LearnContent.cs",
+              "RelativeToolTip": "CreditRisk.API\\Models\\LearnContent.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-24T18:14:03.904Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Program.cs",
+              "DocumentMoniker": "F:\\Projects\\CreditRiskSystem\\CreditRisk.API\\Program.cs",
+              "RelativeDocumentMoniker": "CreditRisk.API\\Program.cs",
+              "ToolTip": "F:\\Projects\\CreditRiskSystem\\CreditRisk.API\\Program.cs",
+              "RelativeToolTip": "CreditRisk.API\\Program.cs",
+              "ViewState": "AgIAAB4AAAAAAAAAAAAAADcAAAAKAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-22T03:12:24.238Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

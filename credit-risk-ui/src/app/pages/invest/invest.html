@@ -1,0 +1,403 @@
+<div class="invest-page">
+  <div class="container">
+
+    <!-- Header -->
+    <div class="invest-page__header" scrollReveal revealDirection="fadeUp">
+      <a routerLink="/" class="invest-page__back">← Back</a>
+      <div class="badge badge--amber">Investment Tools</div>
+      <h1>Plan Your Investments</h1>
+      <p>
+        Three calculators backed by real financial models.
+        Understand your SIP corpus, find your actual CAGR,
+        and simulate how a mutual fund NAV might evolve over time.
+      </p>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div class="tab-nav" scrollReveal revealDirection="fadeIn">
+      <button class="tab-nav__btn"
+              [class.active]="activeTab() === 'sip'"
+              (click)="setTab('sip')">
+        SIP Calculator
+      </button>
+      <button class="tab-nav__btn"
+              [class.active]="activeTab() === 'cagr'"
+              (click)="setTab('cagr')">
+        CAGR Calculator
+      </button>
+      <button class="tab-nav__btn"
+              [class.active]="activeTab() === 'nav'"
+              (click)="setTab('nav')">
+        NAV Simulator
+      </button>
+    </div>
+
+    <!-- SIP Tab -->
+    @if (activeTab() === 'sip') {
+      <div class="tab-content" scrollReveal revealDirection="fadeUp">
+        <div class="calc-layout">
+
+          <div class="calc-inputs">
+            <div class="calc-inputs__title">SIP Calculator</div>
+            <p class="calc-inputs__desc">
+              Calculate how a fixed monthly investment grows over time
+              using the standard SIP future value formula.
+            </p>
+
+            <div class="form-group">
+              <label class="form-label">
+                Monthly Investment — {{ formatCurrency(sipForm.monthlyInvestment) }}
+              </label>
+              <input type="range" class="form-range"
+                     min="500" max="100000" step="500"
+                     [(ngModel)]="sipForm.monthlyInvestment">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">
+                Expected Annual Return — {{ sipForm.annualReturnRate }}%
+              </label>
+              <input type="range" class="form-range"
+                     min="4" max="30" step="0.5"
+                     [(ngModel)]="sipForm.annualReturnRate">
+              <div class="range-labels">
+                <span>4% (FD)</span>
+                <span>30% (Aggressive)</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">
+                Investment Period — {{ sipForm.investmentYears }} years
+              </label>
+              <input type="range" class="form-range"
+                     min="1" max="40" step="1"
+                     [(ngModel)]="sipForm.investmentYears">
+            </div>
+
+            <button class="btn btn--primary"
+                    [disabled]="sipLoading()"
+                    (click)="calculateSIP()">
+              @if (sipLoading()) { Calculating... }
+              @else { Calculate SIP → }
+            </button>
+          </div>
+
+          <div class="calc-results">
+            @if (!sipResult() && !sipLoading()) {
+              <div class="calc-results__empty">
+                Set your inputs and click Calculate SIP
+              </div>
+            }
+
+            @if (sipLoading()) {
+              <div class="calc-results__loading">
+                <div class="loading-spinner"></div>
+              </div>
+            }
+
+            @if (sipResult()) {
+              <div class="sip-results">
+                <div class="sip-results__hero">
+                  <div class="sip-results__label">Final Corpus</div>
+                  <div class="sip-results__value text-approve">
+                    {{ formatCurrency(sipResult().futureValue) }}
+                  </div>
+                </div>
+
+                <div class="sip-results__grid">
+                  <div class="sip-stat">
+                    <div class="sip-stat__label">Total Invested</div>
+                    <div class="sip-stat__value">
+                      {{ formatCurrency(sipResult().totalInvested) }}
+                    </div>
+                  </div>
+                  <div class="sip-stat">
+                    <div class="sip-stat__label">Wealth Gained</div>
+                    <div class="sip-stat__value text-teal">
+                      {{ formatCurrency(sipResult().wealthGained) }}
+                    </div>
+                  </div>
+                  <div class="sip-stat">
+                    <div class="sip-stat__label">Absolute Return</div>
+                    <div class="sip-stat__value text-teal">
+                      {{ sipResult().absoluteReturn | number:'1.1-1' }}%
+                    </div>
+                  </div>
+                  <div class="sip-stat">
+                    <div class="sip-stat__label">Effective CAGR</div>
+                    <div class="sip-stat__value">
+                      {{ (sipResult().cagr * 100) | number:'1.2-2' }}%
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Yearly Breakdown -->
+                @if (sipResult().yearlyBreakdown?.length) {
+                  <div class="breakdown">
+                    <div class="breakdown__title">Year-by-year growth</div>
+                    <div class="breakdown__bars">
+                      @for (row of sipResult().yearlyBreakdown; track row.year) {
+                        <div class="breakdown__row">
+                          <span class="breakdown__year">Yr {{ row.year }}</span>
+                          <div class="breakdown__bar-wrap">
+                            <div class="breakdown__bar breakdown__bar--invested"
+                                 [style.width.%]="(row.totalInvested / sipResult().futureValue) * 100">
+                            </div>
+                            <div class="breakdown__bar breakdown__bar--gain"
+                                 [style.width.%]="(row.gainSoFar / sipResult().futureValue) * 100">
+                            </div>
+                          </div>
+                          <span class="breakdown__corpus">
+                            {{ formatCurrency(row.corpusValue) }}
+                          </span>
+                        </div>
+                      }
+                    </div>
+                    <div class="breakdown__legend">
+                      <span class="breakdown__legend-item breakdown__legend-item--invested">
+                        Invested
+                      </span>
+                      <span class="breakdown__legend-item breakdown__legend-item--gain">
+                        Gains
+                      </span>
+                    </div>
+                  </div>
+                }
+
+                <p class="calc-interp">{{ sipResult().interpretation }}</p>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- CAGR Tab -->
+    @if (activeTab() === 'cagr') {
+      <div class="tab-content" scrollReveal revealDirection="fadeUp">
+        <div class="calc-layout">
+
+          <div class="calc-inputs">
+            <div class="calc-inputs__title">CAGR Calculator</div>
+            <p class="calc-inputs__desc">
+              Find the Compound Annual Growth Rate of any investment.
+              The real annualised return that accounts for compounding.
+            </p>
+
+            <div class="form-group">
+              <label class="form-label">Initial Investment Value (₹)</label>
+              <input class="form-input" type="number"
+                     placeholder="100000"
+                     [(ngModel)]="cagrForm.initialValue">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Final Investment Value (₹)</label>
+              <input class="form-input" type="number"
+                     placeholder="250000"
+                     [(ngModel)]="cagrForm.finalValue">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">
+                Number of Years — {{ cagrForm.years }}
+              </label>
+              <input type="range" class="form-range"
+                     min="1" max="30" step="1"
+                     [(ngModel)]="cagrForm.years">
+            </div>
+
+            <button class="btn btn--primary"
+                    [disabled]="cagrLoading()"
+                    (click)="calculateCAGR()">
+              @if (cagrLoading()) { Calculating... }
+              @else { Calculate CAGR → }
+            </button>
+          </div>
+
+          <div class="calc-results">
+            @if (!cagrResult() && !cagrLoading()) {
+              <div class="calc-results__empty">
+                Enter your investment values and click Calculate CAGR
+              </div>
+            }
+
+            @if (cagrLoading()) {
+              <div class="calc-results__loading">
+                <div class="loading-spinner"></div>
+              </div>
+            }
+
+            @if (cagrResult()) {
+              <div class="cagr-results">
+                <div class="sip-results__hero">
+                  <div class="sip-results__label">CAGR</div>
+                  <div class="sip-results__value"
+                       [class.text-approve]="getCAGRColor(cagrResult().cagr) === 'approve'"
+                       [class.text-review]="getCAGRColor(cagrResult().cagr) === 'review'"
+                       [class.text-reject]="getCAGRColor(cagrResult().cagr) === 'reject'">
+                    {{ (cagrResult().cagr * 100) | number:'1.2-2' }}%
+                  </div>
+                </div>
+
+                <div class="sip-results__grid">
+                  <div class="sip-stat">
+                    <div class="sip-stat__label">Total Gain</div>
+                    <div class="sip-stat__value text-teal">
+                      {{ formatCurrency(cagrResult().totalGain) }}
+                    </div>
+                  </div>
+                  <div class="sip-stat">
+                    <div class="sip-stat__label">Absolute Return</div>
+                    <div class="sip-stat__value">
+                      {{ cagrResult().absoluteReturn | number:'1.1-1' }}%
+                    </div>
+                  </div>
+                </div>
+
+                <div class="performance-badge">
+                  <span class="badge badge--{{
+                    getCAGRColor(cagrResult().cagr) === 'approve' ? 'approve' :
+                    getCAGRColor(cagrResult().cagr) === 'review'  ? 'review'  : 'reject'
+                  }}">
+                    {{ cagrResult().performance }}
+                  </span>
+                </div>
+
+                <p class="calc-interp">{{ cagrResult().interpretation }}</p>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- NAV Tab -->
+    @if (activeTab() === 'nav') {
+      <div class="tab-content" scrollReveal revealDirection="fadeUp">
+        <div class="calc-layout">
+
+          <div class="calc-inputs">
+            <div class="calc-inputs__title">NAV Simulator</div>
+            <p class="calc-inputs__desc">
+              Uses Geometric Brownian Motion to simulate how a mutual
+              fund's NAV might evolve — showing bull case, bear case,
+              and expected outcomes.
+            </p>
+
+            <div class="form-group">
+              <label class="form-label">
+                Initial NAV — ₹{{ navForm.initialNAV }}
+              </label>
+              <input type="range" class="form-range"
+                     min="10" max="1000" step="10"
+                     [(ngModel)]="navForm.initialNAV">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">
+                Expected Annual Return — {{ navForm.annualReturnRate }}%
+              </label>
+              <input type="range" class="form-range"
+                     min="4" max="30" step="1"
+                     [(ngModel)]="navForm.annualReturnRate">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">
+                Annual Volatility — {{ navForm.annualVolatility }}%
+              </label>
+              <input type="range" class="form-range"
+                     min="5" max="50" step="1"
+                     [(ngModel)]="navForm.annualVolatility">
+              <div class="range-labels">
+                <span>5% (Debt fund)</span>
+                <span>50% (Small cap)</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">
+                Projection Period — {{ navForm.years }} years
+              </label>
+              <input type="range" class="form-range"
+                     min="1" max="20" step="1"
+                     [(ngModel)]="navForm.years">
+            </div>
+
+            <button class="btn btn--primary"
+                    [disabled]="navLoading()"
+                    (click)="simulateNAV()">
+              @if (navLoading()) { Simulating... }
+              @else { Run Simulation → }
+            </button>
+          </div>
+
+          <div class="calc-results">
+            @if (!navResult() && !navLoading()) {
+              <div class="calc-results__empty">
+                Set parameters and click Run Simulation
+              </div>
+            }
+
+            @if (navLoading()) {
+              <div class="calc-results__loading">
+                <div class="loading-spinner"></div>
+              </div>
+            }
+
+            @if (navResult()) {
+              <div class="nav-results">
+                <div class="nav-scenarios">
+                  <div class="nav-scenario nav-scenario--bull">
+                    <div class="nav-scenario__label">Bull Case (90th pct)</div>
+                    <div class="nav-scenario__value text-approve">
+                      ₹{{ navResult().bullCaseNAV | number:'1.2-2' }}
+                    </div>
+                  </div>
+                  <div class="nav-scenario nav-scenario--base">
+                    <div class="nav-scenario__label">Expected (Median)</div>
+                    <div class="nav-scenario__value text-teal">
+                      ₹{{ navResult().expectedFinalNAV | number:'1.2-2' }}
+                    </div>
+                  </div>
+                  <div class="nav-scenario nav-scenario--bear">
+                    <div class="nav-scenario__label">Bear Case (10th pct)</div>
+                    <div class="nav-scenario__value text-reject">
+                      ₹{{ navResult().bearCaseNAV | number:'1.2-2' }}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="nav-loss-prob">
+                  <span class="nav-loss-prob__label">
+                    Probability of NAV falling below entry price
+                  </span>
+                  <span class="nav-loss-prob__value"
+                        [class.text-approve]="navResult().probabilityOfLoss < 0.1"
+                        [class.text-review]="navResult().probabilityOfLoss >= 0.1 &&
+                                             navResult().probabilityOfLoss < 0.3"
+                        [class.text-reject]="navResult().probabilityOfLoss >= 0.3">
+                    {{ (navResult().probabilityOfLoss * 100) | number:'1.1-1' }}%
+                  </span>
+                </div>
+
+                <p class="calc-interp">{{ navResult().interpretation }}</p>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Bottom CTA -->
+    <div class="invest-page__cta" scrollReveal revealDirection="fadeUp">
+      <p>Want to compare investing vs taking a loan?</p>
+      <a routerLink="/compare" class="btn btn--outline">
+        Go to Loan vs Fund Comparison →
+      </a>
+    </div>
+
+  </div>
+</div>

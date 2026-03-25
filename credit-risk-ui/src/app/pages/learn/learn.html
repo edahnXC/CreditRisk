@@ -1,0 +1,106 @@
+<div class="learn-page">
+  <div class="container">
+
+    <!-- Header -->
+    <div class="learn-page__header" scrollReveal revealDirection="fadeUp">
+      <a routerLink="/" class="learn-page__back">← Back</a>
+      <div class="badge badge--teal">Financial Education</div>
+      <h1>Learn Financial Models</h1>
+      <p>
+        Every model used on this platform — explained in plain English
+        with the formula, the intuition, and a real-world example.
+        Click any card to expand it.
+      </p>
+    </div>
+
+    <!-- Category Filter -->
+    <div class="filter-wrap" scrollReveal revealDirection="fadeIn">
+      <div class="filter-pills">
+        @for (cat of categories; track cat) {
+          <button class="filter-pill"
+                  [class.active]="activeFilter() === cat"
+                  (click)="setFilter(cat)">
+            {{ cat }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Models Grid -->
+    @if (loading()) {
+      <div class="learn-loading">
+        <div class="loading-spinner"></div>
+        <p>Loading models...</p>
+      </div>
+    }
+
+    @if (!loading()) {
+      <div class="models-list">
+        @for (model of filteredModels; track model.id) {
+          <div class="model-card"
+               [class.model-card--expanded]="isExpanded(model.id)"
+               scrollReveal revealDirection="fadeUp"
+               (click)="toggleExpand(model.id)">
+
+            <div class="model-card__header">
+              <div class="model-card__icon
+                          model-card__icon--{{ getCategoryColor(model.category) }}">
+                {{ model.abbr }}
+              </div>
+              <div class="model-card__info">
+                <div class="model-card__name">{{ model.modelName }}</div>
+                <div class="model-card__category">{{ model.category }}</div>
+              </div>
+              <div class="model-card__summary">{{ model.summary }}</div>
+              <div class="model-card__toggle">
+                {{ isExpanded(model.id) ? '−' : '+' }}
+              </div>
+            </div>
+
+            @if (isExpanded(model.id)) {
+              <div class="model-card__body">
+
+                <div class="model-formula">
+                  <div class="model-formula__label">Formula</div>
+                  <div class="model-formula__value mono">
+                    {{ model.formula }}
+                  </div>
+                </div>
+
+                <div class="model-sections">
+                  <div class="model-section">
+                    <div class="model-section__title">
+                      How it works
+                    </div>
+                    <p class="model-section__text">
+                      {{ model.explanation }}
+                    </p>
+                  </div>
+
+                  <div class="model-section">
+                    <div class="model-section__title">
+                      Real world example
+                    </div>
+                    <p class="model-section__text model-section__text--example">
+                      {{ model.realExample }}
+                    </p>
+                  </div>
+                </div>
+
+                <div class="model-card__footer">
+                  <span class="model-card__used-label">Used in</span>
+                  @for (use of model.usedIn.split(','); track use) {
+                    <span class="badge badge--teal">{{ use.trim() }}</span>
+                  }
+                </div>
+
+              </div>
+            }
+
+          </div>
+        }
+      </div>
+    }
+
+  </div>
+</div>

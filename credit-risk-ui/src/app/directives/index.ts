@@ -1,0 +1,1 @@
+export { ScrollRevealDirective } from './scroll-reveal';

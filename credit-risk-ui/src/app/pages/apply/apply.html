@@ -1,0 +1,390 @@
+<div class="apply-page">
+  <div class="container">
+
+    <div class="apply-page__header" scrollReveal revealDirection="fadeUp">
+      <a routerLink="/" class="apply-page__back">← Back</a>
+      <div class="badge badge--teal">Risk Analysis Tool</div>
+      <h1>Analyse My Loan Profile</h1>
+      <p>
+        Enter your financial details. Our engine runs 5 institutional-grade
+        models to assess your profile — the same way banks evaluate
+        loan applications.
+      </p>
+    </div>
+
+    <!-- Progress -->
+    @if (currentStep() <= 2) {
+      <div class="progress-bar" scrollReveal revealDirection="fadeIn">
+        <div class="progress-bar__steps">
+          @for (step of [1,2]; track step) {
+            <div class="progress-bar__step"
+                 [class.active]="currentStep() === step"
+                 [class.done]="currentStep() > step">
+              <div class="progress-bar__circle">
+                @if (currentStep() > step) { ✓ }
+                @else { {{ step }} }
+              </div>
+              <span class="progress-bar__label">
+                {{ step === 1 ? 'Your Finances' : 'Loan Details' }}
+              </span>
+            </div>
+            @if (step < 2) {
+              <div class="progress-bar__line"
+                   [class.done]="currentStep() > step"></div>
+            }
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Step 1 — Financial Details -->
+    @if (currentStep() === 1) {
+      <div class="form-card" scrollReveal revealDirection="fadeUp">
+        <div class="form-card__title">Your Financial Profile</div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Annual Income (₹)</label>
+            <input class="form-input" type="number"
+                   placeholder="800000"
+                   [(ngModel)]="form.annualIncome">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Existing Total Debt (₹)</label>
+            <input class="form-input" type="number"
+                   placeholder="200000"
+                   [(ngModel)]="form.existingDebt">
+          </div>
+          <div class="form-group">
+            <label class="form-label">
+              Credit Score — {{ form.creditScore }}
+            </label>
+            <input type="range" class="form-range"
+                   min="300" max="850" step="10"
+                   [(ngModel)]="form.creditScore">
+            <div class="range-labels">
+              <span>300 (Poor)</span>
+              <span>850 (Excellent)</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Employment Type</label>
+            <select class="form-input" [(ngModel)]="form.employmentType">
+              @for (type of employmentTypes; track type) {
+                <option [value]="type">{{ type }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">
+              Years Employed — {{ form.employmentYears }} yrs
+            </label>
+            <input type="range" class="form-range"
+                   min="0" max="30" step="1"
+                   [(ngModel)]="form.employmentYears">
+          </div>
+        </div>
+
+        <div class="dti-indicator">
+          <span class="dti-indicator__label">
+            Debt-to-Income Ratio
+          </span>
+          <div class="dti-indicator__bar">
+            <div class="dti-indicator__fill"
+                 [style.width.%]="debtToIncomeRatio * 100"
+                 [class.low]="debtToIncomeRatio < 0.3"
+                 [class.mid]="debtToIncomeRatio >= 0.3 &&
+                               debtToIncomeRatio < 0.5"
+                 [class.high]="debtToIncomeRatio >= 0.5">
+            </div>
+          </div>
+          <span class="dti-indicator__value"
+                [class.text-approve]="debtToIncomeRatio < 0.3"
+                [class.text-review]="debtToIncomeRatio >= 0.3 &&
+                                     debtToIncomeRatio < 0.5"
+                [class.text-reject]="debtToIncomeRatio >= 0.5">
+            {{ (debtToIncomeRatio * 100).toFixed(1) }}%
+          </span>
+        </div>
+
+        <div class="form-card__actions">
+          <button class="btn btn--primary"
+                  [disabled]="!canProceed()"
+                  (click)="nextStep()">
+            Continue →
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- Step 2 — Loan Details -->
+    @if (currentStep() === 2) {
+      <div class="form-card" scrollReveal revealDirection="fadeUp">
+        <div class="form-card__title">Loan Details</div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Loan Amount (₹)</label>
+            <input class="form-input" type="number"
+                   placeholder="500000"
+                   [(ngModel)]="form.loanAmount">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Loan Purpose</label>
+            <select class="form-input" [(ngModel)]="form.loanPurpose">
+              @for (p of loanPurposes; track p) {
+                <option [value]="p">{{ p }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">
+              Loan Term — {{ form.loanTermYears }} years
+            </label>
+            <input type="range" class="form-range"
+                   min="1" max="30" step="1"
+                   [(ngModel)]="form.loanTermYears">
+          </div>
+          <div class="form-group">
+            <label class="form-label">
+              Interest Rate — {{ form.interestRate }}%
+            </label>
+            <input type="range" class="form-range"
+                   min="6" max="24" step="0.5"
+                   [(ngModel)]="form.interestRate">
+          </div>
+        </div>
+
+        <div class="loan-preview">
+          <div class="loan-preview__item">
+            <span class="loan-preview__label">Loan Amount</span>
+            <span class="loan-preview__value">
+              {{ formatCurrency(form.loanAmount) }}
+            </span>
+          </div>
+          <div class="loan-preview__item">
+            <span class="loan-preview__label">Monthly EMI</span>
+            <span class="loan-preview__value text-teal">
+              {{ formatCurrency(monthlyEMI) }}
+            </span>
+          </div>
+          <div class="loan-preview__item">
+            <span class="loan-preview__label">Total Payable</span>
+            <span class="loan-preview__value">
+              {{ formatCurrency(totalPayable) }}
+            </span>
+          </div>
+        </div>
+
+        <div class="form-card__actions">
+          <button class="btn btn--ghost" (click)="prevStep()">
+            ← Back
+          </button>
+          <button class="btn btn--primary"
+                  [disabled]="!canProceed() || loading()"
+                  (click)="analyse()">
+            @if (loading()) { Analysing... }
+            @else { Run Analysis → }
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- Loading -->
+    @if (loading()) {
+      <div class="loading-state">
+        <div class="loading-state__spinner"></div>
+        <p class="loading-state__text">
+          Running 5 financial models on your profile...
+        </p>
+        <div class="loading-state__models">
+          @for (m of ['Sharpe Ratio','CAPM','Kelly Criterion',
+                      'Value at Risk','Merton Model']; track m) {
+            <span class="badge badge--teal">{{ m }}</span>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Results -->
+    @if (currentStep() === 3 && result()) {
+      <div class="results" scrollReveal revealDirection="fadeUp">
+
+        <div class="verdict verdict--{{
+             getScoreColor(result().compositeScore) }}">
+          <div class="verdict__left">
+            <div class="verdict__score">
+              {{ result().compositeScore | number:'1.0-0' }}
+              <span class="verdict__score-max">/100</span>
+            </div>
+            <div class="verdict__label">Risk Score</div>
+          </div>
+          <div class="verdict__right">
+            <div class="verdict__likelihood">
+              Bank Approval Likelihood:
+              <strong>
+                {{ getBankLikelihood(result().compositeScore) }}
+              </strong>
+            </div>
+            <p class="verdict__desc">
+              {{ getBankLikelihoodDesc(result().compositeScore) }}
+            </p>
+          </div>
+        </div>
+
+        <div class="results__grid">
+
+          <div class="result-card"
+               scrollReveal revealDirection="fadeUp"
+               [revealDelay]="0">
+            <div class="result-card__header">
+              <span class="result-card__icon">SR</span>
+              <div>
+                <div class="result-card__name">Sharpe Ratio</div>
+                <div class="result-card__sub">
+                  Risk-adjusted return
+                </div>
+              </div>
+            </div>
+            <div class="result-card__value mono"
+                 [class.text-approve]="result().sharpe.sharpeRatio > 1"
+                 [class.text-review]="result().sharpe.sharpeRatio > 0.5
+                                   && result().sharpe.sharpeRatio <= 1"
+                 [class.text-reject]="result().sharpe.sharpeRatio <= 0.5">
+              {{ result().sharpe.sharpeRatio | number:'1.2-2' }}
+            </div>
+            <div class="result-card__quality">
+              <span class="badge badge--{{
+                result().sharpe.quality === 'Good'       ? 'approve' :
+                result().sharpe.quality === 'Acceptable' ? 'review'  :
+                'reject' }}">
+                {{ result().sharpe.quality }}
+              </span>
+            </div>
+            <p class="result-card__interp">
+              {{ result().sharpe.interpretation }}
+            </p>
+          </div>
+
+          <div class="result-card"
+               scrollReveal revealDirection="fadeUp"
+               [revealDelay]="80">
+            <div class="result-card__header">
+              <span class="result-card__icon">C</span>
+              <div>
+                <div class="result-card__name">CAPM</div>
+                <div class="result-card__sub">Required return</div>
+              </div>
+            </div>
+            <div class="result-card__value mono text-teal">
+              {{ (result().capm.expectedReturn * 100) | number:'1.1-1' }}%
+            </div>
+            <div class="result-card__quality">
+              <span class="badge badge--teal">
+                Min required return
+              </span>
+            </div>
+            <p class="result-card__interp">
+              {{ result().capm.interpretation }}
+            </p>
+          </div>
+
+          <div class="result-card"
+               scrollReveal revealDirection="fadeUp"
+               [revealDelay]="160">
+            <div class="result-card__header">
+              <span class="result-card__icon">K</span>
+              <div>
+                <div class="result-card__name">Kelly Criterion</div>
+                <div class="result-card__sub">Optimal allocation</div>
+              </div>
+            </div>
+            <div class="result-card__value mono"
+                 [class.text-approve]="result().kelly.halfKelly > 0.3"
+                 [class.text-review]="result().kelly.halfKelly > 0.1
+                                   && result().kelly.halfKelly <= 0.3"
+                 [class.text-reject]="result().kelly.halfKelly <= 0.1">
+              {{ (result().kelly.halfKelly * 100) | number:'1.0-0' }}%
+            </div>
+            <div class="result-card__quality">
+              <span class="badge badge--teal">Half-Kelly</span>
+            </div>
+            <p class="result-card__interp">
+              {{ result().kelly.recommendation }}
+            </p>
+          </div>
+
+          <div class="result-card"
+               scrollReveal revealDirection="fadeUp"
+               [revealDelay]="240">
+            <div class="result-card__header">
+              <span class="result-card__icon">VaR</span>
+              <div>
+                <div class="result-card__name">Value at Risk</div>
+                <div class="result-card__sub">
+                  Max loss · 95% · 30d
+                </div>
+              </div>
+            </div>
+            <div class="result-card__value mono text-amber">
+              {{ formatCurrency(result().vaR.vaRAmount) }}
+            </div>
+            <div class="result-card__quality">
+              <span class="badge badge--amber">
+                {{ result().vaR.vaRPercent | number:'1.1-1' }}% of loan
+              </span>
+            </div>
+            <p class="result-card__interp">
+              {{ result().vaR.interpretation }}
+            </p>
+          </div>
+
+          <div class="result-card result-card--wide"
+               scrollReveal revealDirection="fadeUp"
+               [revealDelay]="320">
+            <div class="result-card__header">
+              <span class="result-card__icon">M</span>
+              <div>
+                <div class="result-card__name">Merton Model</div>
+                <div class="result-card__sub">
+                  Distance to default
+                </div>
+              </div>
+            </div>
+            <div class="result-card__value mono"
+                 [class.text-approve]="result().merton.riskBand === 'Safe'"
+                 [class.text-review]="result().merton.riskBand === 'Moderate'"
+                 [class.text-reject]="result().merton.riskBand === 'Elevated'
+                                   || result().merton.riskBand === 'Distressed'">
+              {{ result().merton.distanceToDefault | number:'1.2-2' }}σ
+            </div>
+            <div class="result-card__quality">
+              <span class="badge badge--{{
+                result().merton.riskBand === 'Safe'     ? 'approve' :
+                result().merton.riskBand === 'Moderate' ? 'review'  :
+                'reject' }}">
+                {{ result().merton.riskBand }}
+              </span>
+            </div>
+            <p class="result-card__interp">
+              {{ result().merton.interpretation }}
+            </p>
+          </div>
+
+        </div>
+
+        <div class="results__actions">
+          <button class="btn btn--outline" (click)="resetForm()">
+            ← Run Another Analysis
+          </button>
+          <a routerLink="/invest" class="btn btn--primary">
+            Plan Investment →
+          </a>
+          <a routerLink="/learn" class="btn btn--ghost">
+            Learn about these models →
+          </a>
+        </div>
+
+      </div>
+    }
+
+  </div>
+</div>

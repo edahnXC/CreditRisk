@@ -1,0 +1,325 @@
+<div class="compare-page">
+  <div class="container">
+
+    <!-- Header -->
+    <div class="compare-page__header" scrollReveal revealDirection="fadeUp">
+      <a routerLink="/" class="compare-page__back">← Back</a>
+      <div class="badge badge--purple">Comparison Tool</div>
+      <h1>Loan vs Fund — Which Wins?</h1>
+      <p>
+        Enter your capital and parameters. The engine calculates
+        Sharpe Ratios for both options and tells you which gives
+        better risk-adjusted returns.
+      </p>
+    </div>
+
+    <div class="compare-layout">
+
+      <!-- Inputs Panel -->
+      <div class="compare-inputs" scrollReveal revealDirection="fadeUp">
+
+        <div class="compare-inputs__section">
+          <div class="compare-inputs__section-title">Common Parameters</div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Capital to Deploy — {{ formatCurrency(form.capital) }}
+            </label>
+            <input type="range" class="form-range"
+                   min="100000" max="10000000" step="100000"
+                   [(ngModel)]="form.capital">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Time Horizon — {{ form.years }} years
+            </label>
+            <input type="range" class="form-range"
+                   min="1" max="30" step="1"
+                   [(ngModel)]="form.years">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Risk-Free Rate — {{ form.riskFreeRate }}%
+            </label>
+            <input type="range" class="form-range"
+                   min="3" max="10" step="0.25"
+                   [(ngModel)]="form.riskFreeRate">
+            <div class="range-labels">
+              <span>Current RBI Repo: 6.5%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="compare-inputs__divider"></div>
+
+        <div class="compare-inputs__section">
+          <div class="compare-inputs__section-title compare-inputs__section-title--loan">
+            Loan Parameters
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Interest Rate — {{ form.loanInterestRate }}%
+            </label>
+            <input type="range" class="form-range"
+                   min="6" max="24" step="0.5"
+                   [(ngModel)]="form.loanInterestRate">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Default Probability — {{ form.loanDefaultProb }}%
+            </label>
+            <input type="range" class="form-range"
+                   min="1" max="40" step="1"
+                   [(ngModel)]="form.loanDefaultProb">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Return Volatility — {{ form.loanVolatility }}%
+            </label>
+            <input type="range" class="form-range"
+                   min="5" max="40" step="1"
+                   [(ngModel)]="form.loanVolatility">
+          </div>
+        </div>
+
+        <div class="compare-inputs__divider"></div>
+
+        <div class="compare-inputs__section">
+          <div class="compare-inputs__section-title compare-inputs__section-title--fund">
+            Mutual Fund Parameters
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Expected Annual Return — {{ form.fundAnnualReturn }}%
+            </label>
+            <input type="range" class="form-range"
+                   min="4" max="30" step="0.5"
+                   [(ngModel)]="form.fundAnnualReturn">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Fund Volatility — {{ form.fundVolatility }}%
+            </label>
+            <input type="range" class="form-range"
+                   min="5" max="50" step="1"
+                   [(ngModel)]="form.fundVolatility">
+            <div class="range-labels">
+              <span>5% (Debt)</span>
+              <span>50% (Small cap)</span>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn btn--primary"
+                style="width:100%"
+                [disabled]="loading()"
+                (click)="compare()">
+          @if (loading()) { Comparing... }
+          @else { Run Comparison → }
+        </button>
+
+      </div>
+
+      <!-- Results Panel -->
+      <div class="compare-results">
+
+        @if (!result() && !loading()) {
+          <div class="compare-results__empty">
+            <div class="compare-results__empty-icon">⇄</div>
+            <p>Set your parameters and run the comparison</p>
+          </div>
+        }
+
+        @if (loading()) {
+          <div class="compare-results__loading">
+            <div class="loading-spinner"></div>
+            <p>Calculating Sharpe Ratios...</p>
+          </div>
+        }
+
+        @if (result()) {
+
+          <!-- Verdict Banner -->
+          <div class="verdict-banner"
+               [class.verdict-banner--fund]="getWinner() === 'fund'"
+               [class.verdict-banner--loan]="getWinner() === 'loan'"
+               [class.verdict-banner--tie]="getWinner()  === 'tie'"
+               scrollReveal revealDirection="fadeUp">
+            <div class="verdict-banner__title">
+              @if (getWinner() === 'fund') { Mutual Fund Wins }
+              @else if (getWinner() === 'loan') { Loan Deployment Wins }
+              @else { Too Close to Call }
+            </div>
+            <p class="verdict-banner__desc">
+              {{ result().recommendation }}
+            </p>
+          </div>
+
+          <!-- Side by Side Cards -->
+          <div class="side-by-side" scrollReveal revealDirection="fadeUp"
+               [revealDelay]="100">
+
+            <!-- Loan Card -->
+            <div class="compare-card"
+                 [class.compare-card--winner]="getWinner() === 'loan'">
+              <div class="compare-card__header">
+                <div class="compare-card__icon compare-card__icon--loan">L</div>
+                <div>
+                  <div class="compare-card__title">Loan Deployment</div>
+                  <div class="compare-card__sub">
+                    {{ form.loanInterestRate }}% interest ·
+                    {{ form.loanDefaultProb }}% default risk
+                  </div>
+                </div>
+                @if (getWinner() === 'loan') {
+                  <span class="compare-card__winner-badge">Winner</span>
+                }
+              </div>
+
+              <div class="compare-card__metric">
+                <span class="compare-card__metric-label">Sharpe Ratio</span>
+                <span class="compare-card__metric-value mono"
+                      [class.text-approve]="getSharpeColor(result().loanSharpeRatio) === 'approve'"
+                      [class.text-review]="getSharpeColor(result().loanSharpeRatio)  === 'review'"
+                      [class.text-reject]="getSharpeColor(result().loanSharpeRatio)  === 'reject'">
+                  {{ result().loanSharpeRatio | number:'1.2-2' }}
+                </span>
+              </div>
+
+              <div class="compare-card__metric">
+                <span class="compare-card__metric-label">Effective Return</span>
+                <span class="compare-card__metric-value mono">
+                  {{ (result().loanEffectiveReturn * 100) | number:'1.2-2' }}%
+                </span>
+              </div>
+
+              <div class="compare-card__metric">
+                <span class="compare-card__metric-label">
+                  Future Value ({{ form.years }}yr)
+                </span>
+                <span class="compare-card__metric-value mono text-teal">
+                  {{ formatCurrency(result().loanFutureValue) }}
+                </span>
+              </div>
+
+              <div class="compare-card__rating">
+                <span class="badge badge--{{
+                  result().loanRating === 'Excellent' ? 'approve' :
+                  result().loanRating === 'Good'      ? 'approve' :
+                  result().loanRating === 'Acceptable'? 'review'  : 'reject'
+                }}">{{ result().loanRating }}</span>
+              </div>
+            </div>
+
+            <!-- VS divider -->
+            <div class="vs-divider">
+              <div class="vs-divider__line"></div>
+              <div class="vs-divider__label">VS</div>
+              <div class="vs-divider__line"></div>
+            </div>
+
+            <!-- Fund Card -->
+            <div class="compare-card"
+                 [class.compare-card--winner]="getWinner() === 'fund'">
+              <div class="compare-card__header">
+                <div class="compare-card__icon compare-card__icon--fund">F</div>
+                <div>
+                  <div class="compare-card__title">Mutual Fund</div>
+                  <div class="compare-card__sub">
+                    {{ form.fundAnnualReturn }}% return ·
+                    {{ form.fundVolatility }}% volatility
+                  </div>
+                </div>
+                @if (getWinner() === 'fund') {
+                  <span class="compare-card__winner-badge">Winner</span>
+                }
+              </div>
+
+              <div class="compare-card__metric">
+                <span class="compare-card__metric-label">Sharpe Ratio</span>
+                <span class="compare-card__metric-value mono"
+                      [class.text-approve]="getSharpeColor(result().fundSharpeRatio) === 'approve'"
+                      [class.text-review]="getSharpeColor(result().fundSharpeRatio)  === 'review'"
+                      [class.text-reject]="getSharpeColor(result().fundSharpeRatio)  === 'reject'">
+                  {{ result().fundSharpeRatio | number:'1.2-2' }}
+                </span>
+              </div>
+
+              <div class="compare-card__metric">
+                <span class="compare-card__metric-label">Expected Return</span>
+                <span class="compare-card__metric-value mono">
+                  {{ (result().fundEffectiveReturn * 100) | number:'1.2-2' }}%
+                </span>
+              </div>
+
+              <div class="compare-card__metric">
+                <span class="compare-card__metric-label">
+                  Future Value ({{ form.years }}yr)
+                </span>
+                <span class="compare-card__metric-value mono text-teal">
+                  {{ formatCurrency(result().fundFutureValue) }}
+                </span>
+              </div>
+
+              <div class="compare-card__rating">
+                <span class="badge badge--{{
+                  result().fundRating === 'Excellent' ? 'approve' :
+                  result().fundRating === 'Good'      ? 'approve' :
+                  result().fundRating === 'Acceptable'? 'review'  : 'reject'
+                }}">{{ result().fundRating }}</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Sharpe Advantage Bar -->
+          <div class="sharpe-advantage"
+               scrollReveal revealDirection="fadeUp" [revealDelay]="200">
+            <div class="sharpe-advantage__label">Sharpe Advantage</div>
+            <div class="sharpe-advantage__bar-wrap">
+              <div class="sharpe-advantage__bar-center"></div>
+              @if (result().sharpeAdvantage > 0) {
+                <div class="sharpe-advantage__fill sharpe-advantage__fill--fund"
+                     [style.width.%]="Math.min(Math.abs(result().sharpeAdvantage) * 100, 50)">
+                </div>
+              } @else {
+                <div class="sharpe-advantage__fill sharpe-advantage__fill--loan"
+                     [style.width.%]="Math.min(Math.abs(result().sharpeAdvantage) * 100, 50)">
+                </div>
+              }
+            </div>
+            <div class="sharpe-advantage__labels">
+              <span>Loan better</span>
+              <span class="sharpe-advantage__value">
+                {{ result().sharpeAdvantage > 0 ? '+' : '' }}
+                {{ result().sharpeAdvantage | number:'1.2-2' }}
+              </span>
+              <span>Fund better</span>
+            </div>
+          </div>
+
+          <!-- Reason Summary -->
+          <div class="reason-box"
+               scrollReveal revealDirection="fadeUp" [revealDelay]="300">
+            <div class="reason-box__title">Why this recommendation?</div>
+            <p class="reason-box__text">{{ result().reasonSummary }}</p>
+          </div>
+
+          <button class="btn btn--outline" (click)="reset()"
+                  style="margin-top: 8px">
+            ← Run Another Comparison
+          </button>
+
+        }
+      </div>
+
+    </div>
+  </div>
+</div>

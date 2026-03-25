@@ -1,0 +1,392 @@
+.compare-page {
+  padding: 60px 0 80px;
+
+  &__header {
+    max-width:     640px;
+    margin-bottom: 40px;
+
+    .badge { margin-bottom: 12px; }
+
+    h1 {
+      font-size:      clamp(1.8rem, 3vw, 2.5rem);
+      font-weight:    500;
+      letter-spacing: -0.02em;
+      margin-bottom:  12px;
+    }
+
+    p {
+      font-size:   15px;
+      line-height: 1.7;
+      color:       var(--text-secondary);
+    }
+  }
+
+  &__back {
+    display:         inline-block;
+    font-size:       13px;
+    color:           var(--text-secondary);
+    margin-bottom:   16px;
+    text-decoration: none;
+    transition:      color 0.15s;
+    &:hover { color: var(--text-primary); }
+  }
+}
+
+// ── Layout ────────────────────────────────────────────────────────────────
+.compare-layout {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap:     32px;
+  align-items: start;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ── Inputs Panel ──────────────────────────────────────────────────────────
+.compare-inputs {
+  background:    var(--bg-card);
+  border:        1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding:       24px;
+  display:       flex;
+  flex-direction: column;
+  gap:           20px;
+
+  &__section { display: flex; flex-direction: column; gap: 16px; }
+
+  &__section-title {
+    font-size:   13px;
+    font-weight: 500;
+    color:       var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+
+    &--loan { color: var(--accent-amber); }
+    &--fund { color: var(--accent-teal);  }
+  }
+
+  &__divider {
+    height:     1px;
+    background: var(--border);
+  }
+}
+
+// ── Results Panel ─────────────────────────────────────────────────────────
+.compare-results {
+  display:        flex;
+  flex-direction: column;
+  gap:            16px;
+  min-height:     400px;
+
+  &__empty {
+    display:         flex;
+    flex-direction:  column;
+    align-items:     center;
+    justify-content: center;
+    height:          300px;
+    gap:             12px;
+    background:      var(--bg-card);
+    border:          1px solid var(--border);
+    border-radius:   var(--radius-lg);
+
+    &-icon {
+      font-size: 32px;
+      color:     var(--text-tertiary);
+    }
+
+    p {
+      font-size: 14px;
+      color:     var(--text-tertiary);
+    }
+  }
+
+  &__loading {
+    display:         flex;
+    flex-direction:  column;
+    align-items:     center;
+    justify-content: center;
+    gap:             16px;
+    height:          300px;
+    background:      var(--bg-card);
+    border:          1px solid var(--border);
+    border-radius:   var(--radius-lg);
+
+    p { font-size: 14px; color: var(--text-secondary); }
+  }
+}
+
+.loading-spinner {
+  width:         32px;
+  height:        32px;
+  border:        2px solid var(--border);
+  border-top:    2px solid var(--accent-teal);
+  border-radius: 50%;
+  animation:     spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+// ── Verdict Banner ────────────────────────────────────────────────────────
+.verdict-banner {
+  padding:       20px 24px;
+  border-radius: var(--radius-lg);
+  border:        1px solid;
+
+  &--fund {
+    background:   var(--accent-teal-dim);
+    border-color: rgba(45,212,191,0.3);
+  }
+  &--loan {
+    background:   var(--accent-amber-dim);
+    border-color: rgba(245,158,11,0.3);
+  }
+  &--tie {
+    background:   var(--bg-card);
+    border-color: var(--border);
+  }
+
+  &__title {
+    font-size:     18px;
+    font-weight:   500;
+    color:         var(--text-primary);
+    margin-bottom: 6px;
+  }
+
+  &__desc {
+    font-size:   13px;
+    color:       var(--text-secondary);
+    line-height: 1.6;
+  }
+}
+
+// ── Side by Side ──────────────────────────────────────────────────────────
+.side-by-side {
+  display:     flex;
+  gap:         16px;
+  align-items: stretch;
+
+  @media (max-width: 700px) {
+    flex-direction: column;
+  }
+}
+
+.compare-card {
+  flex:          1;
+  background:    var(--bg-card);
+  border:        1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding:       20px;
+  display:       flex;
+  flex-direction: column;
+  gap:           14px;
+  transition:    border-color 0.2s;
+
+  &--winner {
+    border-color: var(--accent-teal);
+  }
+
+  &__header {
+    display:     flex;
+    align-items: center;
+    gap:         10px;
+  }
+
+  &__icon {
+    width:           36px;
+    height:          36px;
+    border-radius:   var(--radius-sm);
+    display:         flex;
+    align-items:     center;
+    justify-content: center;
+    font-size:       14px;
+    font-weight:     600;
+    font-family:     var(--font-mono);
+    flex-shrink:     0;
+
+    &--loan { background: var(--accent-amber-dim); color: var(--accent-amber); }
+    &--fund { background: var(--accent-teal-dim);  color: var(--accent-teal);  }
+  }
+
+  &__title {
+    font-size:   14px;
+    font-weight: 500;
+    color:       var(--text-primary);
+  }
+
+  &__sub {
+    font-size:   11px;
+    color:       var(--text-secondary);
+    font-family: var(--font-mono);
+  }
+
+  &__winner-badge {
+    margin-left:   auto;
+    font-size:     10px;
+    padding:       3px 8px;
+    border-radius: 20px;
+    background:    var(--accent-teal-dim);
+    color:         var(--accent-teal);
+    font-weight:   500;
+    flex-shrink:   0;
+  }
+
+  &__metric {
+    display:         flex;
+    justify-content: space-between;
+    align-items:     center;
+    padding:         8px 0;
+    border-bottom:   1px solid var(--border);
+
+    &:last-of-type { border-bottom: none; }
+  }
+
+  &__metric-label {
+    font-size: 12px;
+    color:     var(--text-secondary);
+  }
+
+  &__metric-value {
+    font-size:   15px;
+    font-weight: 500;
+    color:       var(--text-primary);
+  }
+
+  &__rating { margin-top: 4px; }
+}
+
+// ── VS Divider ────────────────────────────────────────────────────────────
+.vs-divider {
+  display:         flex;
+  flex-direction:  column;
+  align-items:     center;
+  justify-content: center;
+  gap:             8px;
+  flex-shrink:     0;
+
+  &__line {
+    width:      1px;
+    flex:       1;
+    background: var(--border);
+    min-height: 20px;
+  }
+
+  &__label {
+    font-size:   12px;
+    font-weight: 500;
+    color:       var(--text-tertiary);
+    font-family: var(--font-mono);
+  }
+
+  @media (max-width: 700px) {
+    flex-direction: row;
+    &__line { width: 40px; height: 1px; flex: none; }
+  }
+}
+
+// ── Sharpe Advantage Bar ──────────────────────────────────────────────────
+.sharpe-advantage {
+  background:    var(--bg-card);
+  border:        1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding:       20px;
+
+  &__label {
+    font-size:     12px;
+    color:         var(--text-secondary);
+    margin-bottom: 12px;
+    font-weight:   500;
+  }
+
+  &__bar-wrap {
+    position:      relative;
+    height:        8px;
+    background:    var(--bg-secondary);
+    border-radius: 4px;
+    overflow:      hidden;
+    display:       flex;
+    justify-content: center;
+  }
+
+  &__bar-center {
+    position:   absolute;
+    left:       50%;
+    top:        0;
+    width:      2px;
+    height:     100%;
+    background: var(--border-hover);
+    z-index:    1;
+  }
+
+  &__fill {
+    position:      absolute;
+    height:        100%;
+    top:           0;
+    border-radius: 4px;
+
+    &--fund {
+      left:       50%;
+      background: var(--accent-teal);
+    }
+    &--loan {
+      right:      50%;
+      background: var(--accent-amber);
+    }
+  }
+
+  &__labels {
+    display:         flex;
+    justify-content: space-between;
+    align-items:     center;
+    margin-top:      8px;
+    font-size:       11px;
+    color:           var(--text-tertiary);
+    font-family:     var(--font-mono);
+  }
+
+  &__value {
+    font-size:   13px;
+    font-weight: 500;
+    color:       var(--text-primary);
+    font-family: var(--font-mono);
+  }
+}
+
+// ── Reason Box ────────────────────────────────────────────────────────────
+.reason-box {
+  background:    var(--bg-card);
+  border:        1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding:       20px;
+
+  &__title {
+    font-size:     13px;
+    font-weight:   500;
+    color:         var(--text-primary);
+    margin-bottom: 8px;
+  }
+
+  &__text {
+    font-size:   13px;
+    line-height: 1.7;
+    color:       var(--text-secondary);
+    font-family: var(--font-mono);
+  }
+}
+
+// ── Shared ────────────────────────────────────────────────────────────────
+.form-range {
+  width:        100%;
+  accent-color: var(--accent-teal);
+  cursor:       pointer;
+}
+
+.range-labels {
+  display:         flex;
+  justify-content: space-between;
+  font-size:       10px;
+  color:           var(--text-tertiary);
+  font-family:     var(--font-mono);
+  margin-top:      4px;
+}
