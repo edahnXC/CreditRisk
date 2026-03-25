@@ -15,12 +15,12 @@ builder.Services.AddScoped<FinanceEngineService>();
 builder.Services.AddHttpClient();
 builder.Services.AddSingleton<MarketDataService>();
 
-// ── CORS — allows Angular (running on port 4200) to call this API ─────────
+// ── CORS — allows Angular (Netlify & localhost) to call this API ──────────
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAngular", policy =>
-        policy.WithOrigins("http://localhost:4200",
-                            "https://localhost:4200")
+    options.AddPolicy("AllowMyFrontend", policy =>
+        policy.WithOrigins("https://creditsrisksystem.netlify.app",
+                            "http://localhost:4200")
               .AllowAnyHeader()
               .AllowAnyMethod());
 });
@@ -48,7 +48,9 @@ if (app.Environment.IsDevelopment())
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "Credit Risk API v1"));
 }
 
-app.UseCors("AllowAngular");
+// Fixed: The name here must exactly match the policy name defined above
+app.UseCors("AllowMyFrontend"); 
+
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
