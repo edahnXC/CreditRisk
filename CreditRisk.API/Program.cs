@@ -56,4 +56,13 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 
+// --- Auto-Migrate Database on Startup ---
+// This will automatically create your tables in Neon when Render spins up!
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<AppDbContext>();
+    context.Database.Migrate();
+}
+
 app.Run();
