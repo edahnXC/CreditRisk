@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-const API        = 'https://localhost:7156/api/finance';
-const MARKET_API = 'https://localhost:7156/api/market';
+const API        = 'https://creditrisk-api.onrender.com/api/finance';
+const MARKET_API = 'https://creditrisk-api.onrender.com/api/market';
 
 @Injectable({ providedIn: 'root' })
 export class FinanceService {

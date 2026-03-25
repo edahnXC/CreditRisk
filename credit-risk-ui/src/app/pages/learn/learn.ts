@@ -4,7 +4,7 @@ import { RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { ScrollRevealDirective } from '../../directives/index';
 
-const ADMIN_API = 'https://localhost:7156/api/admin';
+const ADMIN_API = 'https://creditrisk-api.onrender.com/api/admin';
 
 @Component({
   selector:    'app-learn',
