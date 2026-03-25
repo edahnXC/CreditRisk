@@ -51,8 +51,9 @@ export class InvestComponent {
   navLoading = signal(false);
 
   setTab(tab: 'sip' | 'cagr' | 'nav') {
-    this.activeTab.set(tab);
-  }
+  this.activeTab.set(tab);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
   // ── SIP calculation ───────────────────────────────────────────────────
   calculateSIP() {

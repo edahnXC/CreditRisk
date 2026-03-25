@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule, DecimalPipe, DatePipe } from '@angular/common';
 import { FinanceService } from '../../services/finance';
@@ -11,7 +11,7 @@ import { ScrollRevealDirective } from '../../directives/index';
   templateUrl: './home.html',
   styleUrl:    './home.scss'
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit,OnDestroy {
 
   private financeService = inject(FinanceService);
 
@@ -69,10 +69,20 @@ export class HomeComponent implements OnInit {
     { name: 'SIP vs Loan',     tag: 'Comparison'       },
   ];
 
-  ngOnInit() {
-    this.animateCounters();
+  private refreshInterval: any;
+
+ngOnInit() {
+  this.animateCounters();
+  this.loadMarketData();
+  // Refresh market data every 5 minutes
+  this.refreshInterval = setInterval(() => {
     this.loadMarketData();
-  }
+  }, 5 * 60 * 1000);
+}
+
+ngOnDestroy() {
+  if (this.refreshInterval) clearInterval(this.refreshInterval);
+}
 
   toggleMarketCard() {
     this.marketCardOpen.update(v => !v);

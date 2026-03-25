@@ -85,13 +85,14 @@ export class AdminComponent implements OnInit {
 
   // ── Section navigation ────────────────────────────────────────────────
   setSection(section: 'analytics' | 'market' | 'learn' | 'logs') {
-    this.activeSection.set(section);
-    switch (section) {
-      case 'analytics': this.loadAnalytics(); break;
-      case 'learn':     this.loadLearnContent(); break;
-      case 'logs':      this.loadLogs(); break;
-    }
+  this.activeSection.set(section);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  switch (section) {
+    case 'analytics': this.loadAnalytics(); break;
+    case 'learn':     this.loadLearnContent(); break;
+    case 'logs':      this.loadLogs(); break;
   }
+}
 
   // ── Analytics ─────────────────────────────────────────────────────────
   loadAnalytics() {
