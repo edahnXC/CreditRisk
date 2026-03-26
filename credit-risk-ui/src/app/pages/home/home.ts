@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, signal, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule, DecimalPipe, DatePipe } from '@angular/common';
+import { HttpClient } from '@angular/common/http'; // <-- Added HttpClient
 import { FinanceService } from '../../services/finance';
 import { ScrollRevealDirective } from '../../directives/index';
 
@@ -11,9 +12,10 @@ import { ScrollRevealDirective } from '../../directives/index';
   templateUrl: './home.html',
   styleUrl:    './home.scss'
 })
-export class HomeComponent implements OnInit,OnDestroy {
+export class HomeComponent implements OnInit, OnDestroy {
 
   private financeService = inject(FinanceService);
+  private http = inject(HttpClient); // <-- Injected HttpClient to call your API
 
   loansProcessed = signal(0);
   avgRiskScore   = signal(0);
@@ -71,21 +73,45 @@ export class HomeComponent implements OnInit,OnDestroy {
 
   private refreshInterval: any;
 
-ngOnInit() {
-  this.animateCounters();
-  this.loadMarketData();
-  // Refresh market data every 5 minutes
-  this.refreshInterval = setInterval(() => {
+  ngOnInit() {
+    this.loadLiveAnalytics(); // <-- Now calls the live database
     this.loadMarketData();
-  }, 5 * 60 * 1000);
-}
+    
+    // Refresh market data every 5 minutes
+    this.refreshInterval = setInterval(() => {
+      this.loadMarketData();
+    }, 5 * 60 * 1000);
+  }
 
-ngOnDestroy() {
-  if (this.refreshInterval) clearInterval(this.refreshInterval);
-}
+  ngOnDestroy() {
+    if (this.refreshInterval) clearInterval(this.refreshInterval);
+  }
 
   toggleMarketCard() {
     this.marketCardOpen.update(v => !v);
+  }
+
+  // ── Fetch Real Database Analytics ───────────────────────────────────────
+  loadLiveAnalytics() {
+    this.http.get<any>('https://creditrisk-api.onrender.com/api/admin/analytics').subscribe({
+      next: (data) => {
+        // Animate up to the REAL numbers from your database!
+        this.animateTo(v => this.loansProcessed.set(v), 0, data.totalAnalyses, 1800);
+        this.animateTo(v => this.avgRiskScore.set(v),   0, data.avgScore, 1400);
+        this.animateTo(v => this.approvalRate.set(v),   0, data.approvalRate, 1600);
+
+        // Note: Our backend endpoint doesn't currently calculate "Portfolio Value", 
+        // so we will leave that specific one as a static animation for now.
+        this.animateTo(v => this.portfolioValue.set(v), 0, 48, 2000);
+      },
+      error: () => {
+        // If the API fails for some reason, fallback to fake numbers so the UI doesn't look broken
+        this.animateTo(v => this.loansProcessed.set(v), 0, 1284, 1800);
+        this.animateTo(v => this.avgRiskScore.set(v),   0, 74,   1400);
+        this.animateTo(v => this.portfolioValue.set(v), 0, 48,   2000);
+        this.animateTo(v => this.approvalRate.set(v),   0, 68,   1600);
+      }
+    });
   }
 
   loadMarketData() {
@@ -109,13 +135,6 @@ ngOnDestroy() {
         this.marketLoading.set(false);
       }
     });
-  }
-
-  animateCounters() {
-    this.animateTo(v => this.loansProcessed.set(v), 0, 1284, 1800);
-    this.animateTo(v => this.avgRiskScore.set(v),   0, 74,   1400);
-    this.animateTo(v => this.portfolioValue.set(v), 0, 48,   2000);
-    this.animateTo(v => this.approvalRate.set(v),   0, 68,   1600);
   }
 
   animateTo(setter: (v: number) => void, from: number, to: number, duration: number) {
