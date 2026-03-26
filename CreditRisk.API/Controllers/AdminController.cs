@@ -23,7 +23,6 @@ public class AdminController : ControllerBase
     [HttpPost("login")]
     public ActionResult<LoginResponse> Login([FromBody] LoginRequest request)
     {
-        // Hardcoded admin credentials — replace with real auth later
         if (request.Password == "CreditRisk@Admin2024")
             return Ok(new LoginResponse(true, "admin-session-token-2024"));
         return Unauthorized(new LoginResponse(false, ""));
@@ -92,6 +91,15 @@ public class AdminController : ControllerBase
     }
 
     // ── Market Data ───────────────────────────────────────────────────────
+    
+    // NEW: Endpoint to actually fetch the market data!
+    [HttpGet("market")]
+    public async Task<ActionResult<MarketDataSnapshot>> GetMarketData()
+    {
+        var data = await _market.GetMarketDataAsync();
+        return Ok(data);
+    }
+
     [HttpPost("market/update")]
     public async Task<IActionResult> UpdateMarket(
         [FromBody] ManualMarketUpdate request)

@@ -19,13 +19,10 @@ public class MarketDataService
     private readonly IHttpClientFactory _httpFactory;
     private readonly ILogger<MarketDataService> _logger;
 
-    // In-memory cache — refreshes every 24 hours automatically
     private MarketDataSnapshot _cache = new();
     private DateTime _lastFetch = DateTime.MinValue;
     private readonly TimeSpan _cacheDuration = TimeSpan.FromHours(24);
 
-    // Manual override values — set from admin panel
-    // These persist in memory until the app restarts
     private double? _manualRepoRate = null;
     private double? _manualInflationRate = null;
     private double? _manualGoldPer10g = null;
@@ -38,7 +35,6 @@ public class MarketDataService
         _logger = logger;
     }
 
-    // ── Main method called by controller ─────────────────────────────────
     public async Task<MarketDataSnapshot> GetMarketDataAsync()
     {
         if (DateTime.UtcNow - _lastFetch < _cacheDuration)
@@ -60,7 +56,6 @@ public class MarketDataService
         return ApplyManualOverrides(_cache);
     }
 
-    // ── Admin panel calls this to update manually maintained values ───────
     public void UpdateManualValues(
         double? repoRate, double? inflationRate, double? goldPer10g)
     {
@@ -68,7 +63,6 @@ public class MarketDataService
         if (inflationRate.HasValue) _manualInflationRate = inflationRate;
         if (goldPer10g.HasValue) _manualGoldPer10g = goldPer10g;
 
-        // Update cache immediately so next read reflects the new values
         _cache.LastUpdated = DateTime.UtcNow;
         _cache.DataSource = "Live + Admin Override";
 
@@ -77,16 +71,13 @@ public class MarketDataService
             repoRate, inflationRate, goldPer10g);
     }
 
-    // ── Force refresh — called from admin panel ───────────────────────────
     public void InvalidateCache()
     {
         _lastFetch = DateTime.MinValue;
     }
 
-    // ── Apply admin overrides on top of live/cached data ─────────────────
     private MarketDataSnapshot ApplyManualOverrides(MarketDataSnapshot snapshot)
     {
-        // Return a copy so we don't mutate the cached object
         return new MarketDataSnapshot
         {
             RepoRate = _manualRepoRate ?? snapshot.RepoRate,
@@ -100,14 +91,16 @@ public class MarketDataService
         };
     }
 
-    // ── Fetch live data from free APIs ────────────────────────────────────
     private async Task<MarketDataSnapshot> FetchLiveDataAsync()
     {
         var snapshot = new MarketDataSnapshot();
         var client = _httpFactory.CreateClient();
         client.Timeout = TimeSpan.FromSeconds(10);
 
-        // USD/INR — Frankfurter API (free, no key needed)
+        // NEW: Add Headers to pretend we are a browser, avoiding Yahoo's bot-blocker
+        client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
+        client.DefaultRequestHeaders.Add("Accept", "application/json");
+
         try
         {
             var response = await client.GetStringAsync(
@@ -124,7 +117,6 @@ public class MarketDataService
             _logger.LogWarning("USD/INR fetch failed: {msg}", ex.Message);
         }
 
-        // Nifty 50 — Yahoo Finance unofficial endpoint (free, no key)
         try
         {
             var response = await client.GetStringAsync(
@@ -144,7 +136,6 @@ public class MarketDataService
             _logger.LogWarning("Nifty 50 fetch failed: {msg}", ex.Message);
         }
 
-        // Sensex — Yahoo Finance unofficial endpoint
         try
         {
             var response = await client.GetStringAsync(
@@ -164,8 +155,6 @@ public class MarketDataService
             _logger.LogWarning("Sensex fetch failed: {msg}", ex.Message);
         }
 
-        // Repo rate, inflation, gold — use manual overrides if set,
-        // otherwise use last known good defaults
         snapshot.RepoRate = _manualRepoRate ?? 6.50;
         snapshot.InflationRate = _manualInflationRate ?? 4.85;
         snapshot.GoldPer10g = _manualGoldPer10g ?? 72000;

@@ -4,6 +4,7 @@ using CreditRisk.API.Data;
 using CreditRisk.API.FinanceEngine;
 using CreditRisk.API.FinanceEngine.Models;
 using CreditRisk.API.Models;
+using CreditRisk.API.Services; // Added to access MarketDataSnapshot
 
 namespace CreditRisk.API.Controllers;
 
@@ -13,11 +14,21 @@ public class FinanceController : ControllerBase
 {
     private readonly FinanceEngineService _engine;
     private readonly AppDbContext _db;
+    private readonly MarketDataService _market; // Added Market Service
 
-    public FinanceController(FinanceEngineService engine, AppDbContext db)
+    public FinanceController(FinanceEngineService engine, AppDbContext db, MarketDataService market)
     {
         _engine = engine;
         _db = db;
+        _market = market;
+    }
+
+    // NEW: Allows the main frontend dashboard to fetch live market data
+    [HttpGet("market")]
+    public async Task<ActionResult<MarketDataSnapshot>> GetMarketData()
+    {
+        var data = await _market.GetMarketDataAsync();
+        return Ok(data);
     }
 
     [HttpPost("sharpe")]
@@ -107,7 +118,6 @@ public class FinanceController : ControllerBase
         catch (ArgumentException ex) { return BadRequest(ex.Message); }
     }
 
-    // ── Composite endpoint — logs every analysis to database ──────────────
     [HttpPost("loan-risk-profile")]
     public async Task<ActionResult<LoanRiskProfile>> LoanRiskProfile(
         [FromBody] LoanRiskProfileRequest request)
@@ -116,7 +126,6 @@ public class FinanceController : ControllerBase
         {
             var result = _engine.BuildLoanRiskProfile(request);
 
-            // Save to AnalysisLog so admin can see all analyses
             var log = new AnalysisLog
             {
                 AnalysisType = "LoanRiskProfile",
