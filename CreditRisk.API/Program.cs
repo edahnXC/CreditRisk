@@ -1,7 +1,11 @@
+using System.Text;
 using CreditRisk.API.Data;
 using CreditRisk.API.FinanceEngine;
 using CreditRisk.API.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
@@ -17,6 +21,31 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<FinanceEngineService>();
 builder.Services.AddHttpClient();
 builder.Services.AddSingleton<MarketDataService>();
+
+// ── Authentication (JWT Bearer) ───────────────────────────────────────────
+var jwtKey = builder.Configuration["Jwt:Key"] ?? "CreditRiskSystemSuperSecretKey2024!!";
+var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? "CreditRisk.API";
+var jwtAudience = builder.Configuration["Jwt:Audience"] ?? "CreditRisk.Client";
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme    = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey         = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+        ValidateIssuer           = true,
+        ValidIssuer              = jwtIssuer,
+        ValidateAudience         = true,
+        ValidAudience            = jwtAudience,
+        ValidateLifetime         = true,
+        ClockSkew                = TimeSpan.FromMinutes(1)
+    };
+});
 
 // ── CORS — allows Angular (Netlify & localhost) to call this API ──────────
 builder.Services.AddCors(options =>
@@ -39,6 +68,31 @@ builder.Services.AddSwaggerGen(c =>
         Version = "v1",
         Description = "AI-Powered Credit Risk Scoring & Loan Decision System"
     });
+
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme. Example: \"Bearer {token}\"",
+        Name        = "Authorization",
+        In          = ParameterLocation.Header,
+        Type        = SecuritySchemeType.Http,
+        Scheme      = "Bearer",
+        BearerFormat = "JWT"
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id   = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
 });
 
 var app = builder.Build();
@@ -55,6 +109,7 @@ if (app.Environment.IsDevelopment())
 app.UseCors("AllowMyFrontend"); 
 
 app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 

@@ -21,8 +21,9 @@
             <div class="login-error">{{ loginError() }}</div>
           }
           <button class="btn btn--primary" style="width:100%"
+                  [disabled]="loginLoading()"
                   (click)="login()">
-            Sign In →
+            @if (loginLoading()) { Authenticating... } @else { Sign In → }
           </button>
           <a routerLink="/" class="login-card__back">← Back to Home</a>
         </div>
@@ -33,7 +34,14 @@
 
       <div class="admin-header" scrollReveal revealDirection="fadeUp">
         <div>
-          <div class="badge badge--teal">Admin Panel</div>
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+            <div class="badge badge--teal">Admin Panel</div>
+            @if (sessionRemaining()) {
+              <div class="badge" style="background: rgba(16, 185, 129, 0.12); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.25);">
+                ⏱ Active: {{ sessionRemaining() }}
+              </div>
+            }
+          </div>
           <h1>Dashboard</h1>
         </div>
         <button class="btn btn--ghost" (click)="logout()">

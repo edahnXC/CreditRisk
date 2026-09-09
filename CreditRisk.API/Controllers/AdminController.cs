@@ -1,5 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using CreditRisk.API.Data;
 using CreditRisk.API.Models;
 using CreditRisk.API.Services;
@@ -12,23 +17,70 @@ public class AdminController : ControllerBase
 {
     private readonly AppDbContext _db;
     private readonly MarketDataService _market;
+    private readonly IConfiguration _config;
 
-    public AdminController(AppDbContext db, MarketDataService market)
+    public AdminController(AppDbContext db, MarketDataService market, IConfiguration config)
     {
-        _db = db;
+        _db     = db;
         _market = market;
+        _config = config;
     }
 
     // ── Auth ──────────────────────────────────────────────────────────────
+    [AllowAnonymous]
     [HttpPost("login")]
     public ActionResult<LoginResponse> Login([FromBody] LoginRequest request)
     {
-        if (request.Password == "CreditRisk@Admin2024")
-            return Ok(new LoginResponse(true, "admin-session-token-2024"));
-        return Unauthorized(new LoginResponse(false, ""));
+        var expectedPassword = _config["ADMIN_PASSWORD"] 
+                            ?? _config["AdminSettings:Password"] 
+                            ?? "Admin@2025!";
+
+        if (string.IsNullOrWhiteSpace(request?.Password) || request.Password != expectedPassword)
+        {
+            return Unauthorized(new LoginResponse(false, "", null, "Invalid administrator credentials."));
+        }
+
+        // Generate signed JWT Token
+        var jwtKey = _config["Jwt:Key"] ?? "CreditRiskSystemSuperSecretKey2024!!";
+        var jwtIssuer = _config["Jwt:Issuer"] ?? "CreditRisk.API";
+        var jwtAudience = _config["Jwt:Audience"] ?? "CreditRisk.Client";
+        var expiryMins = double.TryParse(_config["Jwt:ExpiryMinutes"], out var mins) ? mins : 480;
+
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var key = Encoding.UTF8.GetBytes(jwtKey);
+        var expiresAt = DateTime.UtcNow.AddMinutes(expiryMins);
+
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            Subject = new ClaimsIdentity(new[]
+            {
+                new Claim(ClaimTypes.Name, "AdminUser"),
+                new Claim(ClaimTypes.Role, "Admin")
+            }),
+            Expires            = expiresAt,
+            Issuer             = jwtIssuer,
+            Audience           = jwtAudience,
+            SigningCredentials = new SigningCredentials(
+                new SymmetricSecurityKey(key),
+                SecurityAlgorithms.HmacSha256Signature)
+        };
+
+        var token = tokenHandler.CreateToken(tokenDescriptor);
+        var tokenString = tokenHandler.WriteToken(token);
+
+        return Ok(new LoginResponse(true, tokenString, expiresAt, "Login successful."));
     }
 
-    // ── Analytics ─────────────────────────────────────────────────────────
+    // ── Token Verification ────────────────────────────────────────────────
+    [Authorize(Roles = "Admin")]
+    [HttpGet("verify")]
+    public IActionResult VerifyToken()
+    {
+        return Ok(new { valid = true, user = User.Identity?.Name ?? "Admin" });
+    }
+
+    // ── Analytics (Public for dashboard display) ───────────────────────────
+    [AllowAnonymous]
     [HttpGet("analytics")]
     public async Task<ActionResult<AnalyticsSummary>> GetAnalytics()
     {
@@ -49,7 +101,8 @@ public class AdminController : ControllerBase
         ));
     }
 
-    // ── Analysis Logs ─────────────────────────────────────────────────────
+    // ── Analysis Logs (Admin Protected) ───────────────────────────────────
+    [Authorize(Roles = "Admin")]
     [HttpGet("logs")]
     public async Task<ActionResult<List<AnalysisLog>>> GetLogs()
     {
@@ -61,6 +114,8 @@ public class AdminController : ControllerBase
     }
 
     // ── Learn Content ─────────────────────────────────────────────────────
+    // Public read for learning library
+    [AllowAnonymous]
     [HttpGet("learn")]
     public async Task<ActionResult<List<LearnContent>>> GetLearnContent()
     {
@@ -70,6 +125,8 @@ public class AdminController : ControllerBase
         return Ok(items);
     }
 
+    // Admin protected for content updates
+    [Authorize(Roles = "Admin")]
     [HttpPut("learn/{id}")]
     public async Task<IActionResult> UpdateLearnContent(
         Guid id, [FromBody] LearnContent updated)
@@ -77,22 +134,21 @@ public class AdminController : ControllerBase
         var item = await _db.LearnContents.FindAsync(id);
         if (item == null) return NotFound();
 
-        item.ModelName = updated.ModelName;
-        item.Summary = updated.Summary;
-        item.Formula = updated.Formula;
+        item.ModelName   = updated.ModelName;
+        item.Summary     = updated.Summary;
+        item.Formula     = updated.Formula;
         item.Explanation = updated.Explanation;
         item.RealExample = updated.RealExample;
-        item.UsedIn = updated.UsedIn;
-        item.IsActive = updated.IsActive;
-        item.UpdatedAt = DateTime.UtcNow;
+        item.UsedIn      = updated.UsedIn;
+        item.IsActive    = updated.IsActive;
+        item.UpdatedAt   = DateTime.UtcNow;
 
         await _db.SaveChangesAsync();
         return Ok(item);
     }
 
     // ── Market Data ───────────────────────────────────────────────────────
-    
-    // NEW: Endpoint to actually fetch the market data!
+    [Authorize(Roles = "Admin")]
     [HttpGet("market")]
     public async Task<ActionResult<MarketDataSnapshot>> GetMarketData()
     {
@@ -100,6 +156,7 @@ public class AdminController : ControllerBase
         return Ok(data);
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPost("market/update")]
     public async Task<IActionResult> UpdateMarket(
         [FromBody] ManualMarketUpdate request)
@@ -111,6 +168,7 @@ public class AdminController : ControllerBase
         return Ok(new { message = "Market data updated successfully." });
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPost("market/refresh")]
     public async Task<IActionResult> RefreshMarket()
     {
@@ -122,7 +180,7 @@ public class AdminController : ControllerBase
 
 // ── Request / Response models ─────────────────────────────────────────────
 public record LoginRequest(string Password);
-public record LoginResponse(bool Success, string Token);
+public record LoginResponse(bool Success, string Token, DateTime? ExpiresAt = null, string? Message = null);
 public record ManualMarketUpdate(
     double? RepoRate,
     double? InflationRate,
