@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CreditRiskSystem — Full Project Documentation & Technical Architecture Report</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+    :root {
+      --primary: #0f172a;
+      --primary-light: #1e293b;
+      --accent: #0284c7;
+      --accent-teal: #0d9488;
+      --accent-emerald: #059669;
+      --accent-amber: #d97706;
+      --accent-rose: #e11d48;
+      --accent-purple: #7c3aed;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --bg-light: #f8fafc;
+      --border: #e2e8f0;
+      --code-bg: #f1f5f9;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    @page {
+      size: A4;
+      margin: 16mm 14mm 16mm 14mm;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: var(--text-main);
+      background-color: #ffffff;
+      line-height: 1.55;
+      font-size: 13px;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .page-break {
+      page-break-before: always;
+    }
+
+    .no-break {
+      page-break-inside: avoid;
+    }
+
+    /* ── COVER PAGE ─────────────────────────────────────────────── */
+    .cover-page {
+      min-height: 96vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 40px 30px;
+      background: linear-gradient(145deg, #090d16 0%, #0f172a 45%, #1e1b4b 100%);
+      color: #ffffff;
+      border-radius: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cover-page::before {
+      content: "";
+      position: absolute;
+      top: -120px;
+      right: -120px;
+      width: 420px;
+      height: 420px;
+      background: radial-gradient(circle, rgba(14, 165, 233, 0.25) 0%, rgba(99, 102, 241, 0.05) 70%, transparent 100%);
+      border-radius: 50%;
+    }
+
+    .cover-top {
+      position: relative;
+      z-index: 2;
+    }
+
+    .badge-univ {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(8px);
+      padding: 6px 16px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: #38bdf8;
+      margin-bottom: 24px;
+    }
+
+    .cover-title {
+      font-size: 34px;
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.8px;
+      background: linear-gradient(to right, #ffffff, #93c5fd, #38bdf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 12px;
+    }
+
+    .cover-subtitle {
+      font-size: 16px;
+      color: #94a3b8;
+      font-weight: 400;
+      max-width: 620px;
+      line-height: 1.45;
+      margin-bottom: 28px;
+    }
+
+    .tech-pill-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+      margin-bottom: 24px;
+    }
+
+    .tech-pill {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      padding: 5px 12px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #e2e8f0;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .tech-pill.highlight {
+      background: rgba(14, 165, 233, 0.2);
+      border-color: rgba(56, 189, 248, 0.4);
+      color: #38bdf8;
+    }
+
+    .cover-meta-card {
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 20px 24px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .meta-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .meta-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #64748b;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .meta-val {
+      font-size: 13px;
+      font-weight: 600;
+      color: #f1f5f9;
+    }
+
+    .cover-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 18px;
+      font-size: 11px;
+      color: #64748b;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* ── TYPOGRAPHY & HEADERS ────────────────────────────────────── */
+    h1, h2, h3, h4 {
+      color: var(--primary);
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+
+    h2 {
+      font-size: 20px;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 6px;
+      margin-top: 26px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    h2 .sec-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      background: var(--accent);
+      color: white;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    h3 {
+      font-size: 14px;
+      margin-top: 16px;
+      margin-bottom: 8px;
+      color: var(--primary-light);
+    }
+
+    p {
+      margin-bottom: 10px;
+      color: var(--text-muted);
+    }
+
+    strong {
+      color: var(--text-main);
+    }
+
+    /* ── CALLOUT BOXES ───────────────────────────────────────────── */
+    .callout {
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin: 12px 0;
+      border-left: 4px solid;
+      background: var(--bg-light);
+    }
+
+    .callout.info {
+      border-color: var(--accent);
+      background: #f0f9ff;
+    }
+
+    .callout.success {
+      border-color: var(--accent-emerald);
+      background: #ecfdf5;
+    }
+
+    .callout.warning {
+      border-color: var(--accent-amber);
+      background: #fffbeb;
+    }
+
+    .callout.highlight {
+      border-color: var(--accent-purple);
+      background: #f5f3ff;
+    }
+
+    .callout-title {
+      font-weight: 700;
+      font-size: 12px;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .callout.info .callout-title { color: #0369a1; }
+    .callout.success .callout-title { color: #047857; }
+    .callout.warning .callout-title { color: #b45309; }
+    .callout.highlight .callout-title { color: #6d28d9; }
+
+    /* ── TABLES ──────────────────────────────────────────────────── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0 16px 0;
+      font-size: 11.5px;
+    }
+
+    th {
+      background: #0f172a;
+      color: #ffffff;
+      text-align: left;
+      padding: 8px 10px;
+      font-weight: 600;
+      border: 1px solid #1e293b;
+    }
+
+    td {
+      padding: 7px 10px;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      vertical-align: top;
+    }
+
+    tr:nth-child(even) td {
+      background-color: #f8fafc;
+    }
+
+    tr:hover td {
+      background-color: #f1f5f9;
+    }
+
+    td strong {
+      color: var(--text-main);
+    }
+
+    /* ── CODE BOXES ──────────────────────────────────────────────── */
+    pre, code {
+      font-family: 'JetBrains Mono', Consolas, monospace;
+    }
+
+    code.inline {
+      background: var(--code-bg);
+      color: #0369a1;
+      padding: 2px 5px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 500;
+      border: 1px solid #cbd5e1;
+    }
+
+    pre {
+      background: #0f172a;
+      color: #f8fafc;
+      padding: 12px 14px;
+      border-radius: 8px;
+      font-size: 11px;
+      line-height: 1.45;
+      margin: 10px 0 14px 0;
+      overflow-x: auto;
+      border: 1px solid #334155;
+    }
+
+    /* ── GRID CARDS ──────────────────────────────────────────────── */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin: 12px 0;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 12px 0;
+    }
+
+    .card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 14px;
+      background: #ffffff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+
+    .card.accent-top {
+      border-top: 3px solid var(--accent);
+    }
+
+    .card.teal-top { border-top: 3px solid var(--accent-teal); }
+    .card.emerald-top { border-top: 3px solid var(--accent-emerald); }
+    .card.amber-top { border-top: 3px solid var(--accent-amber); }
+    .card.purple-top { border-top: 3px solid var(--accent-purple); }
+
+    .card-title {
+      font-weight: 700;
+      font-size: 12.5px;
+      color: var(--primary);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .card-body {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    /* ── WORKFLOW STEPS ─────────────────────────────────────────── */
+    .workflow-timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin: 14px 0;
+    }
+
+    .wf-step {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      border: 1px solid var(--border);
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: #ffffff;
+    }
+
+    .wf-step-num {
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      background: var(--primary);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 12px;
+    }
+
+    .wf-step-content {
+      flex: 1;
+    }
+
+    .wf-step-title {
+      font-weight: 700;
+      font-size: 12.5px;
+      color: var(--primary);
+      margin-bottom: 3px;
+    }
+
+    .wf-step-desc {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    /* ── BADGES & TAGS ──────────────────────────────────────────── */
+    .badge {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .badge-blue { background: #e0f2fe; color: #0284c7; }
+    .badge-green { background: #dcfce7; color: #16a34a; }
+    .badge-amber { background: #fef3c7; color: #d97706; }
+    .badge-purple { background: #f3e8ff; color: #7e22ce; }
+    .badge-gray { background: #f1f5f9; color: #475569; }
+
+    /* ── FOOTER BAR ─────────────────────────────────────────────── */
+    .doc-footer {
+      margin-top: 30px;
+      border-top: 1px solid var(--border);
+      padding-top: 10px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: #94a3b8;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========================================================================= -->
+  <!-- 1. COVER PAGE -->
+  <!-- ========================================================================= -->
+  <div class="cover-page">
+    <div class="cover-top">
+      <div class="badge-univ">Web Technologies & Full-Stack Systems Laboratory</div>
+      <div class="cover-title">CreditRiskSystem</div>
+      <div class="cover-subtitle">
+        An Institutional-Grade Credit Risk Assessment & Quantitative Investment Evaluation Platform featuring Real-Time Scoring, Wealth Analytics, and Secured Management.
+      </div>
+
+      <div class="tech-pill-grid">
+        <span class="tech-pill highlight">HTML5 (Templates)</span>
+        <span class="tech-pill highlight">CSS3 / SCSS (Glassmorphism)</span>
+        <span class="tech-pill highlight">JavaScript (ES6+)</span>
+        <span class="tech-pill highlight">AJAX (HttpClient / RxJS)</span>
+        <span class="tech-pill highlight">TypeScript (Signals)</span>
+        <span class="tech-pill highlight">XML / JSON APIs</span>
+        <span class="tech-pill highlight">SQL Server / EF Core</span>
+        <span class="tech-pill">ASP.NET Core 8 Web API</span>
+        <span class="tech-pill">Angular 18+ Standalone</span>
+      </div>
+    </div>
+
+    <div class="cover-meta-card">
+      <div class="meta-item">
+        <span class="meta-label">Project Domain</span>
+        <span class="meta-val">FinTech • Credit Scoring • Quantitative Finance</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Course / Examination</span>
+        <span class="meta-val">Web Technology Laboratory Examination</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Frontend Architecture</span>
+        <span class="meta-val">Angular 18+ SPA (HTML5, SCSS, TypeScript, AJAX)</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Backend & Database</span>
+        <span class="meta-val">ASP.NET Core 8 REST API • MS SQL Server (EF Core)</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Primary Evaluation Focus</span>
+        <span class="meta-val">HTML, CSS/SCSS, JS, AJAX, XML/JSON, TS & Database</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Documentation Date</span>
+        <span class="meta-val">Academic Year 2024–2026 • Final Submission</span>
+      </div>
+    </div>
+
+    <div class="cover-footer">
+      <span>CreditRiskSystem — Comprehensive Project Report & Architecture Manual</span>
+      <span>Confidential & Academic Submission Copy</span>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ========================================================================= -->
+  <!-- 2. EXECUTIVE SUMMARY & PROBLEM IT SOLVES -->
+  <!-- ========================================================================= -->
+  <h2><span class="sec-num">1</span> Executive Summary & Real-World Utility</h2>
+
+  <p>
+    <strong>CreditRiskSystem</strong> is an enterprise-class financial technology platform engineered to bridge the critical gap between complex institutional credit underwriting and consumer loan decision-making. In traditional banking workflows, credit risk analysis is slow, opaque, heavily manual, and disconnected from dynamic macroeconomic market conditions. Furthermore, retail borrowers and small businesses rarely possess the tools to quantify the true opportunity cost of taking high-interest debt versus investing equivalent capital into wealth-generating mutual funds and systematic investment plans (SIPs).
+  </p>
+
+  <div class="grid-2">
+    <div class="card accent-top">
+      <div class="card-title">⚠️ What Problem Does It Solve?</div>
+      <div class="card-body">
+        <ul>
+          <li><strong>Opaque Bank Decisions:</strong> Borrowers often face loan rejection without actionable insights into why they failed or what financial metric triggered the adverse decision.</li>
+          <li><strong>Slow & Manual Underwriting:</strong> Manual appraisal of debt-to-income ratios and balance sheet leverage requires days of back-and-forth documentation.</li>
+          <li><strong>Lack of Opportunity Cost Awareness:</strong> Borrowers fail to calculate whether borrowing ₹5,00,000 at 9.5% costs them more than what an equivalent mutual fund SIP would compound over 10 years.</li>
+          <li><strong>Static Risk Metrics:</strong> Conventional credit scores ignore real-time macroeconomic shifts (Repo rate fluctuations, inflation spikes, gold volatility).</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card teal-top">
+      <div class="card-title">💡 How Does It Help the User & Bank?</div>
+      <div class="card-body">
+        <ul>
+          <li><strong>Instant Multi-Factor Risk Scoring:</strong> Generates a unified 0–100 Composite Score in under 200ms using 5 institutional mathematical models.</li>
+          <li><strong>Transparent Likelihood Breakdown:</strong> Tells the applicant whether banks will <em>Approve</em>, <em>Conditionally Review</em>, or <em>Reject</em>, explaining the debt-to-income and volatility factors.</li>
+          <li><strong>Wealth Growth & Comparative Engine:</strong> Directly pits loan repayments against systematic investment returns (SIP vs. Loan) using Sharpe-adjusted metrics.</li>
+          <li><strong>Financial Education:</strong> A dynamic interactive encyclopedia (`/learn`) explaining quantitative finance models with formulas and real-world examples.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout info no-break">
+    <div class="callout-title">Core Mission of CreditRiskSystem</div>
+    To democratize quantitative financial risk analysis by delivering a modern, responsive, glassmorphic Single Page Application (SPA) that empowers both loan applicants and credit underwriters to make mathematically proven, data-backed lending and investment decisions.
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 3. PLATFORM MODULES & USER JOURNEYS -->
+  <!-- ========================================================================= -->
+  <h2><span class="sec-num">2</span> Platform Modules & Core Capabilities</h2>
+
+  <p>The platform consists of five tightly integrated functional modules accessible via a responsive Single Page Application navigation bar:</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 18%;">Module & Route</th>
+        <th style="width: 25%;">Target User</th>
+        <th style="width: 32%;">Key Features & Functionality</th>
+        <th style="width: 25%;">Mathematical Models Used</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Loan Profiling</strong><br><code class="inline">/apply</code></td>
+        <td>Loan Applicants & Underwriters</td>
+        <td>Multi-step dynamic form collecting income, existing debt, credit score, employment category, loan amount, and tenure. Provides real-time EMI calculation and instant bank likelihood decisioning.</td>
+        <td>Sharpe Ratio, CAPM, Kelly Criterion, Value at Risk (VaR), Merton Model</td>
+      </tr>
+      <tr>
+        <td><strong>Investment Hub</strong><br><code class="inline">/invest</code></td>
+        <td>Retail & Wealth Investors</td>
+        <td>3-in-1 interactive calculator suite: (1) SIP future corpus calculator with interest gain breakdown, (2) Real CAGR calculator, and (3) Monte Carlo NAV trajectory simulation over 500 stochastic paths.</td>
+        <td>SIP Annuity Formula, CAGR Compound Formula, Geometric Brownian Motion (GBM)</td>
+      </tr>
+      <tr>
+        <td><strong>Loan vs Fund</strong><br><code class="inline">/compare</code></td>
+        <td>Decision-Making Borrowers</td>
+        <td>Pits capital allocation into loan repayment against equity fund accumulation. Compares net wealth generated, Sharpe efficiency, and provides an algorithmic recommendation on which option wins.</td>
+        <td>Sharpe Ratio, Black-Scholes Volatility, Kelly Bet Sizing</td>
+      </tr>
+      <tr>
+        <td><strong>Knowledge Hub</strong><br><code class="inline">/learn</code></td>
+        <td>Students & Financial Analysts</td>
+        <td>Categorized, searchable, and expandable repository of quantitative models with mathematical formulas, summaries, and industry use cases seeded dynamically from the database.</td>
+        <td>All 12 Platform Quantitative Models</td>
+      </tr>
+      <tr>
+        <td><strong>Admin Center</strong><br><code class="inline">/admin</code></td>
+        <td>System Administrators & Risk Heads</td>
+        <td>Secured JWT authentication portal with live session countdown, platform analytics (approval rates, avg score, volume), audit logs of all runs, and live macroeconomic control (Repo rate, Inflation, Gold).</td>
+        <td>JWT Cryptographic Signature, System Aggregations, DB Audit Logging</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="page-break"></div>
+
+  <!-- ========================================================================= -->
+  <!-- 4. COMPLETE SYSTEM WORKFLOW -->
+  <!-- ========================================================================= -->
+  <h2><span class="sec-num">3</span> Complete End-to-End System Workflow</h2>
+
+  <p>
+    The system follows a reactive, decoupled client-server architecture. Below is the step-by-step lifecycle of a user performing a comprehensive credit risk assessment:
+  </p>
+
+  <div class="workflow-timeline">
+    <div class="wf-step">
+      <div class="wf-step-num">1</div>
+      <div class="wf-step-content">
+        <div class="wf-step-title">Client-Side User Input & Form Progression (Angular HTML5 / TypeScript)</div>
+        <div class="wf-step-desc">
+          The user navigates to <code class="inline">/apply</code>. Step 1 collects applicant financial health (Annual Income, Existing Debt, Credit Score, Employment Type). In Step 2, the user inputs requested loan parameters (Loan Amount, Term, Rate). As values are entered, client-side TypeScript computed getters dynamically calculate Debt-to-Income (DTI) ratio, estimated default probability, and monthly EMI in real-time.
+        </div>
+      </div>
+    </div>
+
+    <div class="wf-step">
+      <div class="wf-step-num">2</div>
+      <div class="wf-step-content">
+        <div class="wf-step-title">Asynchronous Request Dispatch (AJAX / HttpClient)</div>
+        <div class="wf-step-desc">
+          Upon clicking <em>"Analyse Profile"</em>, the component sets <code class="inline">loading.set(true)</code>, which instantly renders a visual loading skeleton. The Angular <code class="inline">FinanceService</code> sends an asynchronous HTTP POST request via <code class="inline">HttpClient</code> to <code class="inline">/api/finance/loan-risk-profile</code> with a JSON payload containing normalized parameters (risk-free rate, market return, employment beta mapping, applicant assets, and asset volatility).
+        </div>
+      </div>
+    </div>
+
+    <div class="wf-step">
+      <div class="wf-step-num">3</div>
+      <div class="wf-step-content">
+        <div class="wf-step-title">REST API Controller Ingestion & Model Binding (ASP.NET Core 8)</div>
+        <div class="wf-step-desc">
+          The request arrives at <code class="inline">FinanceController.LoanRiskProfile()</code>. ASP.NET Core deserializes the incoming JSON payload into a strongly-typed <code class="inline">LoanRiskProfileRequest</code> DTO. The controller invokes the high-performance C# <code class="inline">FinanceEngineService</code>.
+        </div>
+      </div>
+    </div>
+
+    <div class="wf-step">
+      <div class="wf-step-num">4</div>
+      <div class="wf-step-content">
+        <div class="wf-step-title">Multi-Model Quantitative Finance Computation (Backend Finance Engine)</div>
+        <div class="wf-step-desc">
+          The Finance Engine executes 5 institutional algorithms in sequence:
+          <ul>
+            <li><strong>Sharpe Calculator:</strong> Evaluates loan return efficiency relative to risk-free rate and volatility.</li>
+            <li><strong>CAPM Calculator:</strong> Computes the hurdle rate of return based on employment stability beta (0.6 for Salaried, 1.3 for Business).</li>
+            <li><strong>Kelly Calculator:</strong> Determines optimal lending fraction based on default probability and payoff ratio.</li>
+            <li><strong>VaR Calculator:</strong> Calculates the Value-at-Risk monetary loss exposure at 95% confidence over 30 days.</li>
+            <li><strong>Merton Calculator:</strong> Evaluates structural distance-to-default treating applicant assets and liabilities under Black-Scholes option theory.</li>
+          </ul>
+          A weighted algorithm normalizes all signals into a 0–100 <strong>Composite Risk Score</strong> and determines the institutional decision: <strong>Approve (Score &ge; 70)</strong>, <strong>Review (Score 40–69)</strong>, or <strong>Reject (Score &lt; 40)</strong>.
+        </div>
+      </div>
+    </div>
+
+    <div class="wf-step">
+      <div class="wf-step-num">5</div>
+      <div class="wf-step-content">
+        <div class="wf-step-title">Database Audit Logging (Entity Framework Core / SQL Server)</div>
+        <div class="wf-step-desc">
+          Before returning the response, the controller instantiates an <code class="inline">AnalysisLog</code> entity, serializing the full input parameters and output results into JSON strings along with the composite score, decision, and timestamp, and persists it asynchronously via <code class="inline">await _db.SaveChangesAsync()</code> into the SQL Server database for regulatory auditing.
+        </div>
+      </div>
+    </div>
+
+    <div class="wf-step">
+      <div class="wf-step-num">6</div>
+      <div class="wf-step-content">
+        <div class="wf-step-title">JSON Response & Dynamic Client Hydration (Angular Signals)</div>
+        <div class="wf-step-desc">
+          The API returns HTTP 200 OK with the structured JSON <code class="inline">LoanRiskProfile</code>. In Angular, the RxJS subscription triggers: <code class="inline">this.result.set(data); this.loading.set(false); this.currentStep.set(3);</code>. Without reloading the page (AJAX), Angular's virtual DOM immediately transitions to Step 3, rendering visual risk badges, Sharpe ratio cards, VaR exposure charts, and bank likelihood explanations.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ========================================================================= -->
+  <!-- 5. WEB TECHNOLOGIES DEEP DIVE (CORE FOCUS) -->
+  <!-- ========================================================================= -->
+  <h2><span class="sec-num">4</span> Web Technologies & Frontend Architecture</h2>
+
+  <p>
+    This project is built from the ground up to showcase state-of-the-art web technology standards. Each tier of the web stack was deliberately chosen and engineered according to modern industry specifications:
+  </p>
+
+  <!-- 4.1 HTML -->
+  <h3>4.1 HTML (HyperText Markup Language — HTML5)</h3>
+  <p>
+    HTML forms the structural backbone of every page in CreditRiskSystem. Rather than relying on outdated table layouts or unsemantic <code class="inline">&lt;div&gt;</code> soup, HTML5 semantic standards are strictly followed:
+  </p>
+  <ul>
+    <li><strong>Semantic Structural Elements:</strong> Extensive use of <code class="inline">&lt;header&gt;</code>, <code class="inline">&lt;nav&gt;</code>, <code class="inline">&lt;main&gt;</code>, <code class="inline">&lt;section&gt;</code>, <code class="inline">&lt;article&gt;</code>, and <code class="inline">&lt;footer&gt;</code> across all pages to guarantee accessibility, search engine readability, and clear DOM tree hierarchy.</li>
+    <li><strong>Angular 18 Modern Control Flow Syntax:</strong>
+      Templates utilize Angular's next-generation declarative control flow blocks:
+      <ul>
+        <li><code class="inline">@if (loading()) { ... } @else { ... }</code> for conditional rendering of loading skeletons versus computed results.</li>
+        <li><code class="inline">@for (model of filteredModels; track model.id) { ... }</code> for high-performance DOM node recycling when listing financial models.</li>
+        <li><code class="inline">@switch (activeSection()) { @case ('analytics') { ... } }</code> for multi-tab administrator views.</li>
+      </ul>
+    </li>
+    <li><strong>HTML5 Form Controls:</strong> Optimized input types (<code class="inline">type="number"</code>, <code class="inline">min</code>, <code class="inline">max</code>, <code class="inline">step</code>, <code class="inline">type="password"</code>) enforcing browser-level data integrity and accessible user interaction before submission.</li>
+    <li><strong>Data Binding Directives:</strong> Property binding (<code class="inline">[disabled]="!canProceed()"</code>), Event binding (<code class="inline">(click)="analyse()"</code>), and Two-way binding (<code class="inline">[(ngModel)]="form.annualIncome"</code>).</li>
+  </ul>
+
+  <!-- 4.2 CSS / SCSS -->
+  <h3>4.2 CSS & SCSS (Cascading Style Sheets / SASS)</h3>
+  <p>
+    The visual presentation is powered by custom SCSS implementing a <strong>Glassmorphic Dark-Themed Design System</strong>. No generic templates or bloated utility libraries are used:
+  </p>
+  <ul>
+    <li><strong>CSS Custom Properties (Variables):</strong> Defined in <code class="inline">styles.scss</code> to maintain global consistency:
+      <pre><code>:root {
+  --bg-primary: #080c14;
+  --bg-card: rgba(15, 23, 42, 0.7);
+  --accent-teal: #14b8a6;
+  --accent-amber: #f59e0b;
+  --accent-purple: #8b5cf6;
+  --border-glass: rgba(255, 255, 255, 0.08);
+}</code></pre>
+    </li>
+    <li><strong>Glassmorphism & Depth:</strong> Components utilize <code class="inline">backdrop-filter: blur(16px)</code> combined with translucent RGBA background gradients and subtle 1px border highlights to achieve a futuristic, multi-layered visual depth.</li>
+    <li><strong>Responsive Layout Systems:</strong> Multi-column layouts are orchestrated via <strong>CSS Flexbox</strong> (<code class="inline">display: flex; justify-content: space-between;</code>) and <strong>CSS Grid</strong> (<code class="inline">grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));</code>), guaranteeing flawless rendering across desktops, laptops, tablets, and smartphones.</li>
+    <li><strong>Micro-Animations & Keyframes:</strong>
+      Smooth CSS transitions (<code class="inline">transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);</code>) and custom keyframe animations:
+      <pre><code>@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 15px rgba(20, 184, 166, 0.2); }
+  50% { box-shadow: 0 0 30px rgba(20, 184, 166, 0.5); }
+}</code></pre>
+    </li>
+    <li><strong>Component Style Encapsulation:</strong> Angular SCSS files (<code class="inline">admin.scss</code>, <code class="inline">apply.scss</code>) use Emulated View Encapsulation, ensuring component styles never unintentionally bleed into global elements.</li>
+  </ul>
+
+  <div class="page-break"></div>
+
+  <!-- 4.3 JAVASCRIPT -->
+  <h3>4.3 JavaScript (ECMAScript 6+ / ESNext Runtime)</h3>
+  <p>
+    JavaScript is the execution engine that powers all client-side logic in the browser:
+  </p>
+  <ul>
+    <li><strong>Browser Event Loop & Execution Context:</strong> Manages user click events, input keystrokes, and asynchronous HTTP task scheduling across microtask and macrotask queues.</li>
+    <li><strong>Complex Mathematical Operations:</strong> Performs immediate mathematical operations on numbers using built-in JS math functions:
+      <pre><code>// Example from apply.ts for monthly EMI calculation:
+const r = (this.form.interestRate / 100) / 12;
+const n = this.form.loanTermYears * 12;
+const emi = (this.form.loanAmount * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);</code></pre>
+    </li>
+    <li><strong>Modern ES6+ Features:</strong> Destructuring assignments, spread syntax (<code class="inline">{ ...this.form }</code>), template literals (<code class="inline">`${API}/sharpe`</code>), arrow functions, and array functional methods (<code class="inline">.map()</code>, <code class="inline">.filter()</code>, <code class="inline">.reduce()</code>).</li>
+    <li><strong>Production Compilation & Bundling:</strong> Angular CLI compiles TypeScript code down to highly optimized, minified, and tree-shaken JavaScript bundles (<code class="inline">chunk-WL2ISWI7.js</code>, <code class="inline">main.js</code>) that load instantaneously in any modern web browser.</li>
+  </ul>
+
+  <!-- 4.4 AJAX -->
+  <h3>4.4 AJAX (Asynchronous JavaScript and XML) & Asynchronous Web Communication</h3>
+  <p>
+    <strong>AJAX is one of the most critical technologies in this project.</strong> In traditional pre-AJAX web applications, submitting a loan form required a full synchronous HTTP POST request, causing a complete browser screen refresh (<code class="inline">F5</code> reload), disrupting user state, and re-downloading HTML, CSS, and images.
+  </p>
+  <div class="callout success">
+    <div class="callout-title">How AJAX is Implemented in CreditRiskSystem</div>
+    In this project, AJAX is implemented using Angular's asynchronous <code class="inline">HttpClient</code> service, which wraps the browser's native <code class="inline">fetch</code> and <code class="inline">XMLHttpRequest</code> APIs inside reactive <strong>RxJS Observables</strong>.
+  </div>
+
+  <ul>
+    <li><strong>Zero Page Reloads (Single Page Application):</strong>
+      When the user clicks <em>"Analyse Profile"</em>, the browser does not reload. An asynchronous HTTP POST request is sent in the background:
+      <pre><code>// In finance.ts (AJAX Service Layer)
+getLoanRiskProfile(data: any): Observable&lt;any&gt; {
+  return this.http.post(`${API}/loan-risk-profile`, data);
+}
+
+// In apply.ts (Component AJAX Subscription)
+this.financeService.getLoanRiskProfile(payload).subscribe({
+  next: (data) => {
+    this.result.set(data);   // Updates UI reactively
+    this.loading.set(false);
+    this.currentStep.set(3);
+  },
+  error: (err) => {
+    this.loading.set(false);
+    console.error("AJAX Error:", err);
+  }
+});</code></pre>
+    </li>
+    <li><strong>Non-Blocking User Experience:</strong> The user interface remains active, animations continue smoothly, and a loading spinner communicates progress while the backend runs quantitative calculations.</li>
+    <li><strong>Dynamic Asynchronous Authorization:</strong> The Admin portal uses AJAX to send JWT Bearer tokens inside the HTTP <code class="inline">Authorization</code> header asynchronously to verify admin sessions without redirecting the user.</li>
+  </ul>
+
+  <!-- 4.5 XML vs JSON -->
+  <h3>4.5 XML (Extensible Markup Language) & JSON Usage</h3>
+  <p>
+    To address academic requirements on how XML and data serialization are utilized in modern web systems, the project clearly delineates the roles of both XML and JSON:
+  </p>
+  <ul>
+    <li><strong>JSON as the Primary Data Interchange Format:</strong>
+      While AJAX originally stood for <em>Asynchronous JavaScript and XML</em>, modern web industry standards have replaced XML data payloads with <strong>JSON (JavaScript Object Notation)</strong>. JSON is natively parsed by JavaScript with zero performance overhead and matches TypeScript object shapes directly (<code class="inline">application/json</code>). Every API communication in this project uses JSON.
+    </li>
+    <li><strong>Where XML IS Actively Used in This Project:</strong>
+      <ol>
+        <li><strong>SVG Vector Graphics (XML Markup):</strong> All high-definition icons throughout the platform (e.g., in <code class="inline">navbar</code>, <code class="inline">home.html</code>, and <code class="inline">admin.html</code>) are written in pure XML using the SVG 1.1 specification:
+          <pre><code>&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"&gt;
+  &lt;path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /&gt;
+&lt;/svg&gt;</code></pre>
+        </li>
+        <li><strong>MSBuild Project Files:</strong> The backend project configuration (<code class="inline">CreditRisk.API.csproj</code>) is an XML document defining target frameworks (<code class="inline">&lt;TargetFramework&gt;net8.0&lt;/TargetFramework&gt;</code>), NuGet package dependencies, and build properties.</li>
+        <li><strong>Foundational XMLHttpRequest API:</strong> The browser's underlying engine for AJAX communication originates from the native XML DOM interface.</li>
+      </ol>
+    </li>
+  </ul>
+
+  <div class="page-break"></div>
+
+  <!-- 4.6 TYPESCRIPT -->
+  <h3>4.6 TypeScript (Type-Safe Full-Stack Frontend Development)</h3>
+  <p>
+    TypeScript provides static type-safety, object-oriented design patterns, and next-generation reactivity across the entire UI codebase:
+  </p>
+  <ul>
+    <li><strong>Angular 18+ Signals for Reactive State Management:</strong>
+      Instead of legacy Zone.js change detection, modern Angular Signals (<code class="inline">signal()</code>, <code class="inline">computed()</code>) are used:
+      <pre><code>// Signal declaration
+isLoggedIn = signal&lt;boolean&gt;(false);
+analytics = signal&lt;any&gt;(null);
+
+// Reactive update
+this.isLoggedIn.set(true);
+this.currentStep.update(step =&gt; step + 1);</code></pre>
+      Signals enable fine-grained, micro-targeted DOM re-rendering, resulting in 60fps UI performance.
+    </li>
+    <li><strong>Strict Typing & Interface Contracts:</strong> Ensures that financial inputs (numbers, interest rates, employment types) cannot be mistakenly handled as strings, eliminating runtime NaN errors.</li>
+    <li><strong>Modern Dependency Injection:</strong> Employs TypeScript's functional <code class="inline">inject()</code> pattern (<code class="inline">private http = inject(HttpClient);</code>) for clean, testable service injection.</li>
+    <li><strong>Custom TypeScript Directives:</strong> The project includes <code class="inline">ScrollRevealDirective</code> (<code class="inline">appScrollReveal</code>) in <code class="inline">directives/scroll-reveal.ts</code>. It interfaces with the browser's native <code class="inline">IntersectionObserver</code> API to add smooth reveal animations as sections enter the user viewport.</li>
+  </ul>
+
+  <!-- ========================================================================= -->
+  <!-- 6. DATABASE & BACKEND ARCHITECTURE -->
+  <!-- ========================================================================= -->
+  <h2><span class="sec-num">5</span> Database & Backend Architecture</h2>
+
+  <p>
+    The server-side layer is built with <strong>ASP.NET Core 8 Web API</strong> and <strong>Entity Framework Core 8</strong>, connecting to <strong>Microsoft SQL Server</strong>.
+  </p>
+
+  <div class="grid-2">
+    <div class="card purple-top">
+      <div class="card-title">🗄️ Relational Database Schema (SQL Server)</div>
+      <div class="card-body">
+        <ul>
+          <li><strong>Applicants Table:</strong> Stores applicant credentials, email (unique index), annual income, and debt-to-income ratio with <code class="inline">decimal(18,2)</code> precision.</li>
+          <li><strong>LoanApplications Table:</strong> Tracks requested principal, interest rate, term, and lifecycle status (<code class="inline">Pending</code>, <code class="inline">Approved</code>, <code class="inline">Rejected</code>). Linked to Applicant via foreign key with restricted deletion.</li>
+          <li><strong>RiskScores Table:</strong> Stores historical and computed risk metrics with cascade delete rules linked to Loan Applications.</li>
+          <li><strong>AnalysisLogs Table:</strong> Regulatory compliance table storing complete input/output JSON audit blobs for every algorithmic decision.</li>
+          <li><strong>LearnContents Table:</strong> CMS table storing educational formulas, summaries, and examples for all 12 quantitative models.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card emerald-top">
+      <div class="card-title">🔒 Security & Authentication Architecture</div>
+      <div class="card-body">
+        <ul>
+          <li><strong>JWT Authentication:</strong> Signed with HMAC-SHA256 tokens in <code class="inline">AdminController.cs</code>. Tokens include claims for <code class="inline">Admin</code> roles and automatic 8-hour expiry.</li>
+          <li><strong>Role-Based Authorization:</strong> Endpoints are protected with <code class="inline">[Authorize(Roles = "Admin")]</code>. Unauthorized calls return HTTP 401/403.</li>
+          <li><strong>Session Countdown & Verification:</strong> Angular frontend monitors remaining JWT validity and verifies authenticity with <code class="inline">/api/admin/verify</code> on startup.</li>
+          <li><strong>CORS Policy:</strong> Configured in <code class="inline">Program.cs</code> allowing secure cross-origin requests from the Angular client.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ========================================================================= -->
+  <!-- 7. QUANTITATIVE FINANCE ENGINES -->
+  <!-- ========================================================================= -->
+  <h2><span class="sec-num">6</span> Institutional Quantitative Models Reference</h2>
+
+  <p>
+    The backend <code class="inline">FinanceEngine</code> implements 12 distinct mathematical finance calculators. Below is the reference sheet of models used in CreditRiskSystem:
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 22%;">Model Name</th>
+        <th style="width: 32%;">Mathematical Formula</th>
+        <th style="width: 46%;">Financial Interpretation & Platform Role</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Sharpe Ratio</strong></td>
+        <td><code class="inline">SR = (R_p - R_f) / σ_p</code></td>
+        <td>Measures excess return earned per unit of total risk. Higher is superior. Used in loan profiling and comparing loan cost vs fund return.</td>
+      </tr>
+      <tr>
+        <td><strong>CAPM (Capital Asset Pricing Model)</strong></td>
+        <td><code class="inline">E(R) = R_f + β * (R_m - R_f)</code></td>
+        <td>Determines expected required return based on systematic risk (beta). Employment type sets beta (Salaried: 0.6, Business: 1.3).</td>
+      </tr>
+      <tr>
+        <td><strong>Kelly Criterion</strong></td>
+        <td><code class="inline">f* = (p * b - q) / b</code></td>
+        <td>Calculates the mathematically optimal fraction of bank capital to allocate to avoid risk of institutional ruin.</td>
+      </tr>
+      <tr>
+        <td><strong>Value at Risk (VaR)</strong></td>
+        <td><code class="inline">VaR = Principal * σ * Z_α * √(t/365)</code></td>
+        <td>Quantifies maximum monetary loss over a 30-day horizon at a 95% confidence level (<code class="inline">Z = 1.645</code>).</td>
+      </tr>
+      <tr>
+        <td><strong>Merton Structural Model</strong></td>
+        <td><code class="inline">DD = [ln(V/D) + (μ - 0.5σ²)T] / (σ√T)</code></td>
+        <td>Treats the borrower's equity as a call option on total assets. Computes Distance-to-Default (DD) from asset volatility.</td>
+      </tr>
+      <tr>
+        <td><strong>Black-Scholes Model</strong></td>
+        <td><code class="inline">C = S*N(d1) - K*e^(-rT)*N(d2)</code></td>
+        <td>Analytical closed-form pricing of financial options; used to price credit guarantees and collateral options.</td>
+      </tr>
+      <tr>
+        <td><strong>Geometric Brownian Motion (GBM)</strong></td>
+        <td><code class="inline">dS_t = μS_t dt + σS_t dW_t</code></td>
+        <td>Stochastic differential equation used in <code class="inline">/invest</code> to simulate 500 Monte Carlo NAV trajectories.</td>
+      </tr>
+      <tr>
+        <td><strong>SIP Future Value</strong></td>
+        <td><code class="inline">FV = P * [((1 + i)^n - 1) / i] * (1 + i)</code></td>
+        <td>Computes compounding accumulation of systematic monthly investments over any horizon.</td>
+      </tr>
+      <tr>
+        <td><strong>CAGR Formula</strong></td>
+        <td><code class="inline">CAGR = (V_final / V_initial)^(1/t) - 1</code></td>
+        <td>Calculates the smoothed annualized geometric growth rate of past financial assets.</td>
+      </tr>
+      <tr>
+        <td><strong>Composite Score</strong></td>
+        <td><code class="inline">Score = 0.35(SR) + 0.35(DD) + 0.20(Kelly) + 0.10(CAPM)</code></td>
+        <td>Unified 0–100 score weighing all signals to yield final <strong>Approve / Review / Reject</strong> decisions.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ========================================================================= -->
+  <!-- 8. PROJECT DIRECTORY STRUCTURE -->
+  <!-- ========================================================================= -->
+  <h2><span class="sec-num">7</span> Project Structure & Component Mapping</h2>
+
+  <div class="grid-2">
+    <div>
+      <h3>Frontend Structure (<code class="inline">credit-risk-ui/</code>)</h3>
+      <pre><code>credit-risk-ui/
+├── src/
+│   ├── app/
+│   │   ├── components/navbar/     # Global Navigation
+│   │   ├── directives/            # ScrollReveal directive
+│   │   ├── pages/
+│   │   │   ├── home/              # Hero, journeys, market card
+│   │   │   ├── apply/             # Multi-step loan profiler
+│   │   │   ├── invest/            # SIP, CAGR, NAV Monte Carlo
+│   │   │   ├── compare/           # Loan vs Fund engine
+│   │   │   ├── learn/             # Model knowledge base
+│   │   │   └── admin/             # JWT auth, logs, market controls
+│   │   ├── services/
+│   │   │   └── finance.ts         # AJAX HttpClient REST service
+│   │   ├── app.routes.ts          # Lazy-loaded route map
+│   │   └── app.config.ts          # Angular client providers
+│   ├── styles.scss                # Global glassmorphic design tokens
+│   └── index.html                 # Single HTML5 host document</code></pre>
+    </div>
+
+    <div>
+      <h3>Backend Structure (<code class="inline">CreditRisk.API/</code>)</h3>
+      <pre><code>CreditRisk.API/
+├── Controllers/
+│   ├── AdminController.cs         # JWT auth, logs, analytics
+│   ├── FinanceController.cs       # Risk profile & math endpoints
+│   └── MarketController.cs        # Macroeconomic data feeds
+├── Data/
+│   └── AppDbContext.cs            # EF Core SQL Server DB context
+├── FinanceEngine/
+│   ├── FinanceEngineService.cs    # Orchestration service
+│   └── Calculators/               # 12 Math calculation classes
+├── Models/                        # Applicant, Loan, Risk, Logs
+├── Services/
+│   └── MarketDataServices.cs      # Live market data fetcher
+├── appsettings.json               # DB connection & JWT keys
+└── Program.cs                     # Middleware, DI, CORS & Auth</code></pre>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ========================================================================= -->
+  <!-- 9. VIVA VOCE DEFENSE & EXAM QUESTIONS -->
+  <!-- ========================================================================= -->
+  <h2><span class="sec-num">8</span> Viva Voce Defense & Technical Q&A</h2>
+
+  <p>
+    Below are essential viva examination questions covering the Web Technology aspects of the project, complete with high-scoring technical responses:
+  </p>
+
+  <div class="card accent-top no-break" style="margin-bottom: 12px;">
+    <div class="card-title">Q1: How is AJAX used in your project, and what is the difference between a traditional web request and an AJAX request?</div>
+    <div class="card-body">
+      <strong>Answer:</strong> In traditional web applications, submitting a form triggers a full HTTP POST that causes the entire browser window to reload (<code class="inline">F5</code> reload), discarding client state and re-rendering all assets. In our project, <strong>AJAX (Asynchronous JavaScript and XML)</strong> is implemented using Angular's <code class="inline">HttpClient</code> service. When a user clicks <em>"Analyse Profile"</em> on <code class="inline">/apply</code>, an asynchronous HTTP request is dispatched in the background without reloading the page. While the server processes the Merton, Sharpe, and VaR models, the UI displays a reactive loading spinner. When the JSON response arrives, Angular reactively updates the component's Signals, transitioning the DOM directly to the Results view seamlessly.
+    </div>
+  </div>
+
+  <div class="card teal-top no-break" style="margin-bottom: 12px;">
+    <div class="card-title">Q2: Why do we say AJAX when you are transmitting JSON instead of XML? Is XML used anywhere in this project?</div>
+    <div class="card-body">
+      <strong>Answer:</strong> Historically, when Jesse James Garrett coined the term AJAX in 2005, XML was the prevailing standard for data interchange. In modern web engineering, <strong>JSON (JavaScript Object Notation)</strong> has superseded XML for RESTful APIs because JSON is lightweight, faster to parse, and natively matches JavaScript objects. However, <strong>XML is actively used in our project</strong> in two distinct ways: (1) All scalable vector graphics (SVG icons) in our Angular templates are defined as valid XML documents with namespaces (<code class="inline">xmlns="http://www.w3.org/2000/svg"</code>), and (2) Our backend build configuration (<code class="inline">CreditRisk.API.csproj</code>) is an XML MSBuild file managing dependencies and build targets.
+    </div>
+  </div>
+
+  <div class="card purple-top no-break" style="margin-bottom: 12px;">
+    <div class="card-title">Q3: What role does TypeScript play in the frontend, and how does it improve upon vanilla JavaScript?</div>
+    <div class="card-body">
+      <strong>Answer:</strong> TypeScript is a strictly typed superset of JavaScript that compiles down to clean ES6 JavaScript. In a financial application where numerical precision is vital, vanilla JavaScript is prone to subtle bugs (e.g., string concatenation instead of addition: <code class="inline">"500000" + "9.5"</code>). TypeScript introduces compile-time type safety, custom interfaces (e.g., <code class="inline">SharpeInput</code>, <code class="inline">LoanRiskProfile</code>), and class decorators (<code class="inline">@Component</code>, <code class="inline">@Injectable</code>). Furthermore, we utilize <strong>Angular 18 Signals</strong> (<code class="inline">signal()</code>, <code class="inline">computed()</code>) in TypeScript to manage state reactively with zero Zone.js overhead.
+    </div>
+  </div>
+
+  <div class="card amber-top no-break" style="margin-bottom: 12px;">
+    <div class="card-title">Q4: How did you implement responsive design and modern styling without third-party CSS frameworks like Bootstrap?</div>
+    <div class="card-body">
+      <strong>Answer:</strong> We implemented a bespoke <strong>SCSS Design System</strong> utilizing CSS Custom Properties (CSS variables) for design tokens (colors, border radii, glassmorphism filters). Layout responsiveness is handled natively using <strong>CSS Flexbox</strong> for navigation bars and toolbars, and <strong>CSS Grid</strong> with <code class="inline">repeat(auto-fit, minmax(280px, 1fr))</code> for multi-card metric grids. Glassmorphism is achieved using <code class="inline">backdrop-filter: blur(16px)</code> with translucent RGBA border highlights. This avoids the heavy performance bloat of external CSS libraries while ensuring 100% custom visual control.
+    </div>
+  </div>
+
+  <div class="card emerald-top no-break" style="margin-bottom: 12px;">
+    <div class="card-title">Q5: How does the frontend communicate with the database, and how is security maintained?</div>
+    <div class="card-body">
+      <strong>Answer:</strong> The frontend never communicates directly with the database. It communicates over HTTPS with the ASP.NET Core 8 Web API via RESTful JSON endpoints. The Web API uses <strong>Entity Framework Core</strong> (an Object-Relational Mapper) to map C# domain models (<code class="inline">Applicant</code>, <code class="inline">LoanApplication</code>, <code class="inline">AnalysisLog</code>) to SQL Server relational tables using parameterized queries that prevent SQL injection. For security, administrator routes are protected by <strong>JWT (JSON Web Tokens)</strong> signed with HMAC-SHA256, transmitted in HTTP <code class="inline">Authorization: Bearer &lt;token&gt;</code> headers.
+    </div>
+  </div>
+
+  <!-- ── DOCUMENT SIGN-OFF ──────────────────────────────────────── -->
+  <div class="doc-footer">
+    <span>CreditRiskSystem • Comprehensive Project Documentation & Architecture Manual</span>
+    <span>Generated for Academic Submission • All Rights Reserved</span>
+  </div>
+
+</body>
+</html>

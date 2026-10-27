@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CreditRiskSystem — Presentation Defense & Technical Viva Guide</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+    :root {
+      --primary: #090d16;
+      --primary-light: #1e293b;
+      --accent: #0284c7;
+      --accent-teal: #0d9488;
+      --accent-emerald: #059669;
+      --accent-amber: #d97706;
+      --accent-rose: #e11d48;
+      --accent-purple: #7c3aed;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --bg-light: #f8fafc;
+      --border: #e2e8f0;
+      --code-bg: #0f172a;
+      --code-fg: #f8fafc;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    @page {
+      size: A4;
+      margin: 16mm 14mm 16mm 14mm;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: var(--text-main);
+      background-color: #ffffff;
+      line-height: 1.55;
+      font-size: 13px;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .page-break {
+      page-break-before: always;
+    }
+
+    .no-break {
+      page-break-inside: avoid;
+    }
+
+    /* ── COVER PAGE ─────────────────────────────────────────────── */
+    .cover-page {
+      min-height: 96vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 40px 30px;
+      background: linear-gradient(145deg, #060911 0%, #0c1222 45%, #181030 100%);
+      color: #ffffff;
+      border-radius: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cover-page::before {
+      content: "";
+      position: absolute;
+      top: -120px;
+      right: -120px;
+      width: 440px;
+      height: 440px;
+      background: radial-gradient(circle, rgba(13, 148, 136, 0.3) 0%, rgba(124, 58, 237, 0.08) 70%, transparent 100%);
+      border-radius: 50%;
+    }
+
+    .cover-top {
+      position: relative;
+      z-index: 2;
+    }
+
+    .badge-univ {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      backdrop-filter: blur(8px);
+      padding: 6px 16px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: #2dd4bf;
+      margin-bottom: 24px;
+    }
+
+    .cover-title {
+      font-size: 33px;
+      font-weight: 800;
+      line-height: 1.18;
+      letter-spacing: -0.8px;
+      background: linear-gradient(to right, #ffffff, #a7f3d0, #2dd4bf);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 12px;
+    }
+
+    .cover-subtitle {
+      font-size: 16px;
+      color: #94a3b8;
+      font-weight: 400;
+      max-width: 630px;
+      line-height: 1.45;
+      margin-bottom: 24px;
+    }
+
+    .tech-pill-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .tech-pill {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      padding: 5px 12px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #e2e8f0;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .tech-pill.highlight {
+      background: rgba(45, 212, 191, 0.2);
+      border-color: rgba(45, 212, 191, 0.45);
+      color: #2dd4bf;
+    }
+
+    .cover-meta-card {
+      background: rgba(12, 18, 34, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 20px 24px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .meta-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .meta-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #64748b;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .meta-val {
+      font-size: 13px;
+      font-weight: 600;
+      color: #f1f5f9;
+    }
+
+    .cover-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 18px;
+      font-size: 11px;
+      color: #64748b;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* ── TYPOGRAPHY ─────────────────────────────────────────────── */
+    h2 {
+      font-size: 19px;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 6px;
+      margin-top: 24px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    h2 .sec-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      background: var(--accent-teal);
+      color: white;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    h3 {
+      font-size: 14px;
+      margin-top: 14px;
+      margin-bottom: 6px;
+      color: var(--primary-light);
+    }
+
+    p {
+      margin-bottom: 10px;
+      color: var(--text-muted);
+    }
+
+    strong {
+      color: var(--text-main);
+    }
+
+    /* ── CALLOUT BOXES ───────────────────────────────────────────── */
+    .callout {
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin: 12px 0;
+      border-left: 4px solid;
+      background: var(--bg-light);
+    }
+
+    .callout.info { border-color: var(--accent); background: #f0f9ff; }
+    .callout.success { border-color: var(--accent-emerald); background: #ecfdf5; }
+    .callout.warning { border-color: var(--accent-amber); background: #fffbeb; }
+    .callout.purple { border-color: var(--accent-purple); background: #faf5ff; }
+
+    .callout-title {
+      font-weight: 700;
+      font-size: 12px;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .callout.info .callout-title { color: #0369a1; }
+    .callout.success .callout-title { color: #047857; }
+    .callout.warning .callout-title { color: #b45309; }
+    .callout.purple .callout-title { color: #6d28d9; }
+
+    /* ── TABLES ──────────────────────────────────────────────────── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10px 0 14px 0;
+      font-size: 11.5px;
+    }
+
+    th {
+      background: #0f172a;
+      color: #ffffff;
+      text-align: left;
+      padding: 8px 10px;
+      font-weight: 600;
+      border: 1px solid #1e293b;
+    }
+
+    td {
+      padding: 7px 10px;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      vertical-align: top;
+    }
+
+    tr:nth-child(even) td { background-color: #f8fafc; }
+    tr:hover td { background-color: #f1f5f9; }
+
+    /* ── CODE BOXES ──────────────────────────────────────────────── */
+    pre, code {
+      font-family: 'JetBrains Mono', Consolas, monospace;
+    }
+
+    code.inline {
+      background: #f1f5f9;
+      color: #0369a1;
+      padding: 2px 5px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 500;
+      border: 1px solid #cbd5e1;
+    }
+
+    pre {
+      background: var(--code-bg);
+      color: var(--code-fg);
+      padding: 12px 14px;
+      border-radius: 8px;
+      font-size: 10.5px;
+      line-height: 1.45;
+      margin: 8px 0 12px 0;
+      overflow-x: auto;
+      border: 1px solid #334155;
+    }
+
+    /* ── Q&A CARD ────────────────────────────────────────────────── */
+    .qa-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 15px;
+      margin-bottom: 12px;
+      background: #ffffff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+
+    .qa-card.teal { border-top: 3px solid var(--accent-teal); }
+    .qa-card.blue { border-top: 3px solid var(--accent); }
+    .qa-card.purple { border-top: 3px solid var(--accent-purple); }
+    .qa-card.amber { border-top: 3px solid var(--accent-amber); }
+    .qa-card.emerald { border-top: 3px solid var(--accent-emerald); }
+
+    .qa-q {
+      font-weight: 700;
+      font-size: 12.5px;
+      color: var(--primary);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .qa-a {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .qa-a strong {
+      color: var(--text-main);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin: 12px 0;
+    }
+
+    .doc-footer {
+      margin-top: 26px;
+      border-top: 1px solid var(--border);
+      padding-top: 10px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: #94a3b8;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========================================================================= -->
+  <!-- COVER PAGE -->
+  <!-- ========================================================================= -->
+  <div class="cover-page">
+    <div class="cover-top">
+      <div class="badge-univ">Project Presentation & Technical Viva Defense Manual</div>
+      <div class="cover-title">CreditRiskSystem — Viva Guide & Presentation Topics</div>
+      <div class="cover-subtitle">
+        In-Depth Guide covering Architecture Concepts, SCSS Fundamentals, Live Data Pipelines, DOM Animation Directives, Responsive Web Design, Code Walkthroughs, and Model Answers for Presentation Defense.
+      </div>
+
+      <div class="tech-pill-grid">
+        <span class="tech-pill highlight">SCSS vs CSS</span>
+        <span class="tech-pill highlight">Live Market Ingestion</span>
+        <span class="tech-pill highlight">IntersectionObserver</span>
+        <span class="tech-pill highlight">Angular 18 Architecture</span>
+        <span class="tech-pill highlight">Responsive Design (RWD)</span>
+        <span class="tech-pill highlight">Financial Calculators</span>
+        <span class="tech-pill">Admin Security</span>
+        <span class="tech-pill">Code Snippets</span>
+      </div>
+    </div>
+
+    <div class="cover-meta-card">
+      <div class="meta-item">
+        <span class="meta-label">Admin Portal Route</span>
+        <span class="meta-val"><code class="inline">/admin</code> (Frontend) • <code class="inline">/api/admin/login</code> (Backend)</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Admin Password</span>
+        <span class="meta-val"><code class="inline">Admin@2025!</code> (Configured in appsettings.json)</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Primary Framework</span>
+        <span class="meta-val">Angular 18+ Standalone with TypeScript Signals</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Styling Paradigm</span>
+        <span class="meta-val">Custom SCSS (Glassmorphic Dark Mode, Flexbox, Grid)</span>
+      </div>
+    </div>
+
+    <div class="cover-footer">
+      <span>CreditRiskSystem • Comprehensive Presentation Defense & Viva Guide</span>
+      <span>Confidential & Academic Copy</span>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ========================================================================= -->
+  <!-- SECTION 1: QUICK REFERENCE & ADMIN ACCESS -->
+  <!-- ========================================================================= -->
+  <h2><span class="sec-num">1</span> Admin Portal Access & Credentials</h2>
+
+  <div class="callout warning no-break">
+    <div class="callout-title">🔑 Administrator Login Details</div>
+    <ul>
+      <li><strong>Frontend Navigation Route:</strong> <code class="inline">/admin</code> (Access via browser: <code class="inline">http://localhost:4200/admin</code> or live deployment).</li>
+      <li><strong>Backend API Endpoint:</strong> <code class="inline">POST /api/admin/login</code> (Handled by <code class="inline">AdminController.cs</code>).</li>
+      <li><strong>Admin Username:</strong> No username required (Single-credential institutional role).</li>
+      <li><strong>Admin Password:</strong> <code class="inline">Admin@2025!</code> (Defined in <code class="inline">appsettings.json</code> under <code class="inline">AdminSettings:Password</code>).</li>
+      <li><strong>Show / Hide Password Feature:</strong> Now integrated directly on the admin login card with an interactive SVG eye toggle!</li>
+    </ul>
+  </div>
+
+  <p>
+    When you enter <code class="inline">Admin@2025!</code> and submit, the server generates an HMAC-SHA256 signed <strong>JSON Web Token (JWT)</strong> valid for 8 hours (480 minutes). The token is saved in browser <code class="inline">sessionStorage</code> under the key <code class="inline">'admin-token'</code>. Every subsequent administrative request asynchronously includes <code class="inline">Authorization: Bearer &lt;token&gt;</code> in its HTTP headers.
+  </p>
+
+  <!-- ========================================================================= -->
+  <!-- SECTION 2: WHAT IS SCSS & HOW DOES IT WORK? -->
+  <!-- ========================================================================= -->
+  <h2><span class="sec-num">2</span> Understanding SCSS (Sassy Cascading Style Sheets)</h2>
+
+  <div class="qa-card teal no-break">
+    <div class="qa-q">What do you mean by SCSS, and why did we use it instead of regular CSS?</div>
+    <div class="qa-a">
+      <strong>SCSS (Sassy CSS)</strong> is a powerful CSS preprocessor that extends standard CSS with programmatic superpowers: nesting, variables, mixins, math operations, and modular imports. Browsers cannot understand SCSS directly, so during the build process (<code class="inline">ng build</code>), the Angular Sass compiler transpiles all <code class="inline">.scss</code> files into standard, highly optimized, minified CSS (<code class="inline">styles.css</code>).
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 25%;">Feature</th>
+        <th style="width: 35%;">Standard CSS Limitation</th>
+        <th style="width: 40%;">How SCSS Solves It in Our Project</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Selector Nesting</strong></td>
+        <td>Must repeat parent class names over and over:<br><code class="inline">.login-card { }</code><br><code class="inline">.login-card .form-input { }</code></td>
+        <td>Clean visual hierarchy using nesting and the BEM parent selector (<code class="inline">&amp;</code>):<br>
+        <code class="inline">.login-card { &amp;__icon { } &amp;__title { } }</code></td>
+      </tr>
+      <tr>
+        <td><strong>Design System Tokens</strong></td>
+        <td>Native CSS variables exist, but SCSS variables allow compile-time constants, math, and color functions.</td>
+        <td>We combine both! SCSS compiles global color maps and breakpoint variables with zero runtime overhead.</td>
+      </tr>
+      <tr>
+        <td><strong>Hover &amp; State Styling</strong></td>
+        <td>Requires writing separate rules:<br><code class="inline">.journey-card--teal:hover { }</code></td>
+        <td>Nested pseudo-classes:<br><code class="inline">&amp;--teal:hover { border-color: var(--accent-teal); }</code></td>
+      </tr>
+      <tr>
+        <td><strong>Modularity</strong></td>
+        <td>Loading multiple CSS files causes multiple HTTP network roundtrips.</td>
+        <td>Component-scoped SCSS (<code class="inline">styleUrl: './home.scss'</code>) bundles styles directly with the component JS chunk.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ========================================================================= -->
+  <!-- SECTION 3: LIVE MARKET DATA FETCHING PIPELINE -->
+  <!-- ========================================================================= -->
+  <h2><span class="sec-num">3</span> How Live Market Data is Fetched</h2>
+
+  <div class="qa-card blue no-break">
+    <div class="qa-q">How is the live market information fetched and displayed on the home page?</div>
+    <div class="qa-a">
+      The live market data pipeline is a multi-tier architecture spanning public macroeconomic APIs, ASP.NET Core server-side caching, and Angular asynchronous HttpClient polling:
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="callout info">
+      <div class="callout-title">1. Server-Side Data Ingestion (<code class="inline">MarketDataServices.cs</code>)</div>
+      <ul>
+        <li><strong>USD / INR Exchange Rate:</strong> Fetched from Frankfurter Open Currency API: <code class="inline">https://api.frankfurter.app/latest?from=USD&amp;to=INR</code>.</li>
+        <li><strong>Nifty 50 Index:</strong> Fetched live via Yahoo Finance Chart API: <code class="inline">^NSEI?interval=1d&amp;range=1d</code>.</li>
+        <li><strong>BSE Sensex:</strong> Fetched live via Yahoo Finance Chart API: <code class="inline">^BSESN?interval=1d&amp;range=1d</code>.</li>
+        <li><strong>Macroeconomic Policy Rates:</strong> RBI Repo Rate (6.50%), Inflation (4.85%), and Gold Price (₹72,000/10g) are cached and can be manually updated in real-time by the Admin.</li>
+        <li><strong>In-Memory Caching:</strong> Cached for 24 hours to prevent API rate-limiting.</li>
+      </ul>
+    </div>
+
+    <div class="callout success">
+      <div class="callout-title">2. Client-Side Presentation (<code class="inline">HomeComponent</code>)</div>
+      <ul>
+        <li>When <code class="inline">HomeComponent</code> initializes (<code class="inline">ngOnInit()</code>), it calls <code class="inline">financeService.getMarketSnapshot()</code>.</li>
+        <li>The Angular <code class="inline">HttpClient</code> makes an asynchronous AJAX GET call to <code class="inline">/api/market/snapshot</code>.</li>
+        <li>The response populates the <code class="inline">marketData</code> Signal.</li>
+        <li>The collapsible floating widget on the homepage displays green/amber live badges and auto-formats numbers using Angular's <code class="inline">DecimalPipe</code>.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ========================================================================= -->
+  <!-- SECTION 4: SCROLL REVEAL IMPLEMENTATION -->
+  <!-- ========================================================================= -->
+  <h2><span class="sec-num">4</span> Scroll Reveal: How Elements Appear on Scrolling</h2>
+
+  <div class="qa-card emerald no-break">
+    <div class="qa-q">When scrolling down the page, different elements appear with smooth animations. How is this implemented?</div>
+    <div class="qa-a">
+      This is implemented using a custom Angular Directive: <strong><code class="inline">ScrollRevealDirective</code></strong> (<code class="inline">directives/scroll-reveal.ts</code>). Instead of using heavy third-party JavaScript libraries or lagging <code class="inline">window.onscroll</code> event listeners that slow down the browser, we use the browser's native, hardware-accelerated <strong><code class="inline">IntersectionObserver</code> API</strong>.
+    </div>
+  </div>
+
+  <p>Here is the exact code and mechanism from <code class="inline">scroll-reveal.ts</code>:</p>
+
+  <pre><code>// 1. Initial State: Element is hidden and translated downwards
+private setInitialState(el: HTMLElement) {
+  el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+  el.style.opacity    = '0';
+  if (this.revealDirection === 'fadeUp')    el.style.transform = 'translateY(32px)';
+  if (this.revealDirection === 'fadeLeft')  el.style.transform = 'translateX(-32px)';
+  if (this.revealDirection === 'fadeRight') el.style.transform = 'translateX(32px)';
+}
+
+// 2. IntersectionObserver watches when element enters viewport
+this.observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      setTimeout(() => {
+        element.style.opacity   = '1';
+        element.style.transform = 'none'; // Smoothly returns to natural position!
+      }, this.revealDelay);
+      this.observer.unobserve(element); // Disconnects observer to save memory
+    }
+  });
+}, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });</code></pre>
+
+  <p>
+    <strong>How we attach it to HTML elements:</strong><br>
+    We simply add the directive attribute to any card or section:
+    <code class="inline">&lt;div class="journey-card" scrollReveal revealDirection="fadeUp" [revealDelay]="200"&gt;</code>.
+  </p>
+
+  <!-- ========================================================================= -->
+  <!-- SECTION 5: HOW THE DIFFERENT CALCULATORS WORK -->
+  <!-- ========================================================================= -->
+  <h2><span class="sec-num">5</span> How the Different Calculators Work</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 20%;">Calculator</th>
+        <th style="width: 25%;">Mathematical Principle</th>
+        <th style="width: 55%;">Working Mechanism in Code</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>SIP Calculator</strong><br>(Investment Page)</td>
+        <td>Future Value of Annuity<br><code class="inline">FV = P * [((1+i)^n - 1) / i] * (1+i)</code></td>
+        <td>Takes monthly deposit $P$, converts annual return to monthly compounding rate $i = r/12$, and calculates future wealth, total invested capital, and total wealth gain over $n$ months.</td>
+      </tr>
+      <tr>
+        <td><strong>CAGR Calculator</strong><br>(Investment Page)</td>
+        <td>Compound Annual Growth<br><code class="inline">(V_final / V_initial)^(1/t) - 1</code></td>
+        <td>Calculates the exact smoothed geometric annual growth rate of any asset given initial investment, final value, and number of years.</td>
+      </tr>
+      <tr>
+        <td><strong>NAV Monte Carlo</strong><br>(Investment Page)</td>
+        <td>Geometric Brownian Motion (GBM)<br><code class="inline">dS_t = μS_t dt + σS_t dW_t</code></td>
+        <td>Runs 500 stochastic simulation paths using drift ($\mu$), annual volatility ($\sigma$), and random Gaussian increments ($dW$). Calculates median expected NAV, 10th percentile worst-case, and 90th percentile bull-case.</td>
+      </tr>
+      <tr>
+        <td><strong>Loan Risk Profiler</strong><br>(Apply Page)</td>
+        <td>5-Factor Quantitative Engine<br>(Sharpe + CAPM + Kelly + VaR + Merton)</td>
+        <td>Computes borrower default probability, calculates 30-day Value-at-Risk exposure, and evaluates Distance-to-Default (Merton model). Combines them into a 0–100 Composite Score: <strong>Approve (&ge;70)</strong>, <strong>Review (40–69)</strong>, <strong>Reject (&lt;40)</strong>.</td>
+      </tr>
+      <tr>
+        <td><strong>Loan vs. Fund</strong><br>(Compare Page)</td>
+        <td>Sharpe-Adjusted Opportunity Cost Analysis</td>
+        <td>Pits borrowing interest outflow against investing the same capital in an equity fund. Compares net wealth created and Sharpe ratios, recommending whether taking a loan or investing is mathematically superior.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="page-break"></div>
+
+  <!-- ========================================================================= -->
+  <!-- SECTION 6: NAVIGATION MENU & RESPONSIVE DESIGN -->
+  <!-- ========================================================================= -->
+  <h2><span class="sec-num">6</span> Navigation Menu & Responsive Design (Aspect Ratios)</h2>
+
+  <div class="qa-card purple no-break">
+    <div class="qa-q">What do we call the menu that we added?</div>
+    <div class="qa-a">
+      The menu is called a <strong>Sticky Glassmorphic Navigation Bar</strong> on desktop, which dynamically adapts into an <strong>Interactive Mobile Drawer / Hamburger Menu</strong> on smaller screens.
+      <ul>
+        <li><strong>Sticky Behavior:</strong> Uses Angular Signals (`scrolled = signal(false)`) listening to window scroll. When scrolled past 20px, it applies the class <code class="inline">navbar--scrolled</code>, adding a dark frosted glass effect (<code class="inline">backdrop-filter: blur(20px)</code>).</li>
+        <li><strong>Active Link Highlighting:</strong> Uses Angular's <code class="inline">routerLinkActive="active"</code> to automatically highlight the current page.</li>
+        <li><strong>Hamburger Toggle:</strong> On screens below 768px, navigation links collapse, and an animated 3-bar hamburger icon appears (<code class="inline">navbar__burger</code>). Clicking it triggers <code class="inline">toggleMenu()</code>, sliding out the mobile drawer.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="qa-card amber no-break">
+    <div class="qa-q">How have we implemented responsive design across different screen sizes and aspect ratios?</div>
+    <div class="qa-a">
+      We implemented <strong>Responsive Web Design (RWD)</strong> without any heavy third-party frameworks through a multi-tiered CSS architecture:
+      <ol>
+        <li><strong>CSS Media Queries:</strong> Targeted breakpoints at 1200px (desktop), 900px (tablets/laptops), 768px (tablets), and 500px (mobile):
+          <pre><code>.stats__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr)); // 4 columns on desktop
+  @media (max-width: 900px) { grid-template-columns: repeat(2, minmax(0, 1fr)); } // 2 cols
+  @media (max-width: 500px) { grid-template-columns: 1fr; } // 1 col on mobile
+}</code></pre>
+        </li>
+        <li><strong>CSS Grid with Auto-Fit:</strong> Fluid card containers use <code class="inline">repeat(auto-fit, minmax(280px, 1fr))</code>, allowing cards to automatically reorganize without manual media queries.</li>
+        <li><strong>CSS Flexbox with Wrap:</strong> Action bars and form controls use <code class="inline">flex-wrap: wrap</code>, preventing horizontal overflow on narrow screens.</li>
+        <li><strong>Relative &amp; Viewport Units:</strong> Using <code class="inline">rem</code>, <code class="inline">vh</code>, and percentage widths instead of hardcoded pixel sizes.</li>
+        <li><strong>Vector Scalability (SVG):</strong> All icons use SVG with <code class="inline">viewBox="0 0 24 24"</code>, rendering razor-sharp on Retina and standard screens.</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- SECTION 7: HOVER EFFECTS ON JOURNEY CARDS -->
+  <!-- ========================================================================= -->
+  <h2><span class="sec-num">7</span> Journey Cards Hover Effects: How and Why</h2>
+
+  <div class="qa-card teal no-break">
+    <div class="qa-q">Hovering on different journey cards on the homepage shows different colored borders. How and why?</div>
+    <div class="qa-a">
+      <strong>WHY (Design Rationale & UX):</strong>
+      Each journey card represents a completely different financial workflow:
+      <ul>
+        <li><strong>Teal Border:</strong> Loan Risk Profiler (<code class="inline">/apply</code>) &mdash; Teal communicates stability, security, and institutional credit trust.</li>
+        <li><strong>Amber Border:</strong> Investment Tools (<code class="inline">/invest</code>) &mdash; Amber/Gold symbolizes wealth growth, compounding returns, and capital accumulation.</li>
+        <li><strong>Purple Border:</strong> Loan vs. Fund Comparison (<code class="inline">/compare</code>) &mdash; Purple represents strategic intelligence and analytical decision-making.</li>
+      </ul>
+      This color-coding creates immediate visual hierarchy and gives the user tactile micro-feedback.
+
+      <br><br>
+      <strong>HOW (CSS Implementation in <code class="inline">home.scss</code>):</strong>
+      <pre><code>.journey-card {
+  transition: border-color 0.2s ease, transform 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px); // Subtle elevation
+  }
+
+  &--teal:hover   { border-color: var(--accent-teal);   } // #14b8a6
+  &--amber:hover  { border-color: var(--accent-amber);  } // #f59e0b
+  &--purple:hover { border-color: var(--accent-purple); } // #8b5cf6
+}</code></pre>
+      In HTML, Angular renders the dynamic class: <code class="inline">&lt;div class="journey-card journey-card--{{ j.color }}"&gt;</code>.
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ========================================================================= -->
+  <!-- SECTION 8: WHY USE ANGULAR & HOW DID IT HELP? -->
+  <!-- ========================================================================= -->
+  <h2><span class="sec-num">8</span> Why Use Angular and How Did It Help?</h2>
+
+  <div class="qa-card blue no-break">
+    <div class="qa-q">Why choose Angular over React, Vue, or Vanilla JavaScript, and how did it help our project?</div>
+    <div class="qa-a">
+      Angular 18 was chosen because financial enterprise software demands strict architectural structure, compile-time safety, and high-performance reactive state management:
+      <ol>
+        <li><strong>Single Page Application (SPA) Performance:</strong> Users navigate between Loan Profiling, Investment Calculators, Model Learning, and Admin Dashboard with <strong>zero page refreshes</strong>. Navigation is instantaneous.</li>
+        <li><strong>Angular 18 Signals:</strong> Provides fine-grained reactive state management (<code class="inline">signal()</code>, <code class="inline">computed()</code>) with micro-targeted DOM re-renders, giving 60fps performance without Zone.js overhead.</li>
+        <li><strong>First-Class TypeScript Integration:</strong> Catching numerical type mismatch errors at compile-time instead of having runtime financial calculation failures.</li>
+        <li><strong>Built-In Dependency Injection &amp; HttpClient:</strong> Out-of-the-box AJAX architecture with RxJS Observables, eliminating the need to install external libraries like Axios.</li>
+        <li><strong>Standalone Component Architecture:</strong> Eliminates bloated <code class="inline">NgModule</code> files, enabling modular, lazy-loaded route bundles (as seen in our build output: <code class="inline">admin.js</code>, <code class="inline">apply.js</code>, <code class="inline">invest.js</code>).</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- SECTION 9: CODE EXAMPLES FROM OUR PROJECT -->
+  <!-- ========================================================================= -->
+  <h2><span class="sec-num">9</span> Code Snippets & Angular Implementation Examples</h2>
+
+  <h3>9.1 Real JavaScript / TypeScript Calculation Snippet (<code class="inline">apply.ts</code>)</h3>
+  <pre><code>// Dynamic EMI & Risk Calculation in TypeScript:
+get debtToIncomeRatio(): number {
+  return this.form.annualIncome > 0
+    ? Math.min(this.form.existingDebt / this.form.annualIncome, 1)
+    : 0;
+}
+
+get monthlyEMI(): number {
+  const r = (this.form.interestRate / 100) / 12; // Monthly interest rate
+  const n = this.form.loanTermYears * 12;        // Total months
+  if (r === 0) return this.form.loanAmount / n;
+  // Standard Amortization Formula: P * r * (1+r)^n / ((1+r)^n - 1)
+  return (this.form.loanAmount * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+}</code></pre>
+
+  <h3>9.2 Complete Angular Triad Architecture (Component TS + HTML + SCSS)</h3>
+  <p>Here is how a feature is structured from end-to-end in CreditRiskSystem:</p>
+
+  <div class="grid-2">
+    <div>
+      <strong>TypeScript Component (<code class="inline">admin.ts</code>)</strong>
+      <pre><code>@Component({
+  selector: 'app-admin',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  templateUrl: './admin.html',
+  styleUrl: './admin.scss'
+})
+export class AdminComponent {
+  private http = inject(HttpClient);
+  password = '';
+  showPassword = signal(false); // Reactive Signal
+  isLoggedIn = signal(false);
+
+  login() {
+    this.http.post&lt;any&gt;(`${API}/login`, { password: this.password })
+      .subscribe({
+        next: (res) => {
+          sessionStorage.setItem('admin-token', res.token);
+          this.isLoggedIn.set(true);
+        }
+      });
+  }
+}</code></pre>
+    </div>
+
+    <div>
+      <strong>HTML Template (<code class="inline">admin.html</code>)</strong>
+      <pre><code>&lt;!-- Two-Way Binding &amp; Signal-Driven Type Toggle --&gt;
+&lt;div class="password-input-wrap"&gt;
+  &lt;input class="form-input"
+         [type]="showPassword() ? 'text' : 'password'"
+         placeholder="Enter password"
+         [(ngModel)]="password"
+         (keyup.enter)="login()"&gt;
+
+  &lt;button type="button" class="password-toggle-btn"
+          (click)="showPassword.update(v =&gt; !v)"&gt;
+    @if (showPassword()) {
+      &lt;svg ...&gt;&lt;!-- Eye Off Icon --&gt;&lt;/svg&gt;
+    } @else {
+      &lt;svg ...&gt;&lt;!-- Eye On Icon --&gt;&lt;/svg&gt;
+    }
+  &lt;/button&gt;
+&lt;/div&gt;</code></pre>
+    </div>
+  </div>
+
+  <div class="doc-footer">
+    <span>CreditRiskSystem • Presentation Defense & Technical Viva Guide</span>
+    <span>Ready for Evaluation • All Rights Reserved</span>
+  </div>
+
+</body>
+</html>

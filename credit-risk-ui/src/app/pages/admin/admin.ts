@@ -25,6 +25,7 @@ export class AdminComponent implements OnInit, OnDestroy {
   loginLoading      = signal(false);
   sessionRemaining  = signal('');
   password          = '';
+  showPassword      = signal(false);
   private sessionTimer: any = null;
 
   // ── Active section ────────────────────────────────────────────────────
